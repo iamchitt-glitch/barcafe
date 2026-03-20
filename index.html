@@ -1,428 +1,233 @@
 <!DOCTYPE html>
-<!-- saved from url=(0048)file:///Users/sathit/Downloads/bar-cafe-app.html -->
-<html lang="th"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-
-<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
-<title>BAR CAFE — ระบบบัญชี</title>
-<link href="./index_files/css2" rel="stylesheet">
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="BAR CAFE">
+<title>BAR CAFE — บัญชีร้าน</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 :root {
-  --espresso: #2C1810;
+  --bg: #F7F3EE;
+  --card: #FFFFFF;
+  --espresso: #1E110A;
   --brown: #5C3D2E;
-  --caramel: #C8956C;
-  --cream: #F5EFE6;
-  --milk: #FBF8F4;
-  --foam: #FFFFFF;
-  --green: #2D6A4F;
-  --green-light: #D8F3DC;
-  --green-text: #1B4332;
-  --red: #B5361A;
-  --red-light: #FFE8E3;
-  --red-text: #7B1D0E;
-  --amber: #92600A;
-  --amber-light: #FFF3CD;
-  --amber-text: #5C3A08;
-  --blue: #1A4F7A;
-  --blue-light: #DBEAFE;
-  --border: rgba(92,61,46,0.12);
-  --shadow: 0 1px 3px rgba(44,24,16,0.08), 0 4px 16px rgba(44,24,16,0.06);
+  --caramel: #B8834A;
+  --caramel-light: #F5E6D3;
+  --green: #276749;
+  --green-bg: #E8F5EE;
+  --red: #C0392B;
+  --red-bg: #FDECEA;
+  --amber: #8B6914;
+  --amber-bg: #FEF9E7;
+  --blue: #1A5276;
+  --blue-bg: #EBF5FB;
+  --border: rgba(92,61,46,0.10);
+  --text: #1E110A;
+  --text2: #7D6153;
   --radius: 14px;
-  --radius-sm: 8px;
+  --shadow: 0 2px 12px rgba(30,17,10,0.07);
 }
 * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
-html { font-size: 16px; }
-body { font-family: 'Sarabun', sans-serif; background: var(--cream); color: var(--espresso); min-height: 100vh; }
+body { font-family: 'Sarabun', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding-bottom: 80px; }
 
-/* NAV */
-.nav { background: var(--espresso); color: var(--cream); padding: 0; position: sticky; top: 0; z-index: 100; }
-.nav-brand { padding: 14px 16px 0; display: flex; align-items: baseline; gap: 8px; }
-.nav-brand h1 { font-family: 'Playfair Display', serif; font-size: 20px; color: var(--caramel); letter-spacing: 0.02em; }
-.nav-brand span { font-size: 12px; color: rgba(245,239,230,0.5); font-weight: 300; }
-.nav-tabs { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 8px; }
+/* ── NAV ── */
+.nav { background: var(--espresso); position: sticky; top: 0; z-index: 50; }
+.nav-top { display: flex; align-items: center; justify-content: space-between; padding: 12px 16px 6px; }
+.nav-logo { font-size: 18px; font-weight: 600; color: var(--caramel); letter-spacing: 0.06em; }
+.nav-logo span { font-size: 11px; font-weight: 300; color: rgba(245,230,211,0.45); margin-left: 8px; letter-spacing: 0; }
+.sync-pill { display: flex; align-items: center; gap: 5px; padding: 4px 10px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.sync-on  { background: rgba(39,103,73,0.35); color: #7DCEA0; }
+.sync-off { background: rgba(139,105,20,0.35); color: #F9E79F; }
+.sync-dot { width: 6px; height: 6px; border-radius: 50%; }
+.sync-on  .sync-dot { background: #52BE80; }
+.sync-off .sync-dot { background: #F4D03F; }
+.nav-tabs { display: flex; overflow-x: auto; scrollbar-width: none; padding: 0 8px; gap: 2px; }
 .nav-tabs::-webkit-scrollbar { display: none; }
-.nav-tab { flex-shrink: 0; padding: 10px 12px; font-size: 13px; font-weight: 400; color: rgba(245,239,230,0.55); background: none; border: none; cursor: pointer; border-bottom: 2px solid transparent; transition: all .2s; white-space: nowrap; font-family: 'Sarabun', sans-serif; }
-.nav-tab.active { color: var(--caramel); border-bottom-color: var(--caramel); font-weight: 500; }
+.ntab { flex-shrink: 0; padding: 9px 14px; font-size: 13px; font-weight: 400; color: rgba(245,230,211,0.45); background: none; border: none; border-bottom: 2px solid transparent; cursor: pointer; font-family: 'Sarabun', sans-serif; white-space: nowrap; transition: all .15s; }
+.ntab.active { color: var(--caramel); border-bottom-color: var(--caramel); font-weight: 600; }
 
-/* PAGES */
-.page { display: none; padding: 16px; padding-bottom: 32px; max-width: 600px; margin: 0 auto; }
-.page.active { display: block; }
+/* ── PAGES ── */
+.page { display: none; padding: 14px 14px 24px; max-width: 580px; margin: 0 auto; }
+.page.on { display: block; }
 
-/* CARDS */
-.card { background: var(--foam); border-radius: var(--radius); padding: 18px; margin-bottom: 14px; box-shadow: var(--shadow); border: 0.5px solid var(--border); }
-.card-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--caramel); margin-bottom: 14px; }
+/* ── CARDS ── */
+.card { background: var(--card); border-radius: var(--radius); padding: 16px; margin-bottom: 12px; box-shadow: var(--shadow); }
+.card-label { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--caramel); margin-bottom: 12px; }
 
-/* METRICS GRID */
-.metrics { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 14px; }
-.metric { background: var(--foam); border-radius: var(--radius-sm); padding: 14px; box-shadow: var(--shadow); border: 0.5px solid var(--border); }
-.metric-label { font-size: 11px; color: var(--brown); opacity: 0.7; margin-bottom: 5px; font-weight: 400; }
-.metric-value { font-size: 22px; font-weight: 600; line-height: 1; }
-.metric-sub { font-size: 11px; margin-top: 4px; opacity: 0.65; }
-.v-green { color: var(--green); }
-.v-red { color: var(--red); }
-.v-amber { color: var(--amber); }
-.v-brown { color: var(--brown); }
+/* ── METRICS ── */
+.grid2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 12px; }
+.mcard { background: var(--card); border-radius: 12px; padding: 13px 14px; box-shadow: var(--shadow); }
+.mlabel { font-size: 11px; color: var(--text2); margin-bottom: 4px; }
+.mval { font-size: 22px; font-weight: 600; line-height: 1.1; }
+.msub { font-size: 11px; color: var(--text2); margin-top: 3px; }
+.c-green { color: var(--green); }
+.c-red   { color: var(--red); }
+.c-amber { color: var(--amber); }
 
-/* FORM */
-.field { margin-bottom: 14px; }
-.field label { display: block; font-size: 13px; font-weight: 500; color: var(--brown); margin-bottom: 6px; }
+/* ── FORM ── */
+.field { margin-bottom: 13px; }
+.field label { display: block; font-size: 13px; font-weight: 500; color: var(--brown); margin-bottom: 5px; }
 .field input, .field select, .field textarea {
-  width: 100%; padding: 12px 14px; font-size: 15px; font-family: 'Sarabun', sans-serif;
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  background: var(--milk); color: var(--espresso); transition: border-color .2s, box-shadow .2s;
-  -webkit-appearance: none;
+  width: 100%; padding: 11px 13px; font-size: 15px; font-family: 'Sarabun', sans-serif;
+  background: var(--bg); color: var(--text); border: 1px solid var(--border);
+  border-radius: 9px; transition: border-color .15s, box-shadow .15s; -webkit-appearance: none;
 }
 .field input:focus, .field select:focus, .field textarea:focus {
-  outline: none; border-color: var(--caramel); box-shadow: 0 0 0 3px rgba(200,149,108,0.15);
+  outline: none; border-color: var(--caramel); background: #fff; box-shadow: 0 0 0 3px rgba(184,131,74,0.12);
 }
-.field textarea { resize: vertical; min-height: 72px; }
-.field .hint { font-size: 12px; color: var(--brown); opacity: 0.6; margin-top: 4px; }
-.field-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.field textarea { resize: vertical; min-height: 68px; }
+.field .hint { font-size: 11px; color: var(--text2); margin-top: 4px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 
-/* BUTTONS */
-.btn-primary {
+/* ── BUTTONS ── */
+.btn-main {
   width: 100%; padding: 14px; background: var(--espresso); color: var(--caramel);
-  border: none; border-radius: var(--radius-sm); font-size: 15px; font-weight: 600;
-  font-family: 'Sarabun', sans-serif; cursor: pointer; transition: all .2s; letter-spacing: 0.02em;
+  border: none; border-radius: 10px; font-size: 15px; font-weight: 600;
+  font-family: 'Sarabun', sans-serif; cursor: pointer; letter-spacing: 0.02em; transition: all .15s;
 }
-.btn-primary:hover { background: var(--brown); }
-.btn-primary:active { transform: scale(0.98); }
-.btn-secondary {
-  padding: 9px 16px; background: var(--cream); color: var(--brown);
-  border: 1px solid var(--border); border-radius: var(--radius-sm);
-  font-size: 13px; font-family: 'Sarabun', sans-serif; cursor: pointer; transition: all .2s;
-}
-.btn-secondary:hover { background: var(--milk); }
-.btn-danger { padding: 5px 10px; background: var(--red-light); color: var(--red); border: none; border-radius: 6px; font-size: 12px; font-family: 'Sarabun', sans-serif; cursor: pointer; }
+.btn-main:active { transform: scale(0.98); opacity: 0.9; }
+.btn-sm { padding: 7px 13px; background: var(--bg); color: var(--brown); border: 1px solid var(--border); border-radius: 8px; font-size: 13px; font-family: 'Sarabun', sans-serif; cursor: pointer; }
+.btn-del { padding: 4px 9px; background: var(--red-bg); color: var(--red); border: none; border-radius: 6px; font-size: 11px; font-family: 'Sarabun', sans-serif; cursor: pointer; }
 
-/* BADGES */
-.badge { display: inline-flex; align-items: center; padding: 3px 9px; border-radius: 99px; font-size: 12px; font-weight: 500; }
-.badge-green { background: var(--green-light); color: var(--green-text); }
-.badge-red { background: var(--red-light); color: var(--red-text); }
-.badge-amber { background: var(--amber-light); color: var(--amber-text); }
-.badge-blue { background: var(--blue-light); color: var(--blue); }
+/* ── LIST ITEMS ── */
+.litem { display: flex; justify-content: space-between; align-items: flex-start; padding: 11px 0; border-bottom: 0.5px solid var(--border); }
+.litem:last-child { border-bottom: none; }
+.lname { font-size: 14px; font-weight: 500; }
+.lmeta { font-size: 11px; color: var(--text2); margin-top: 2px; line-height: 1.5; }
+.lamt  { font-size: 15px; font-weight: 600; text-align: right; }
+.lsub  { font-size: 11px; text-align: right; margin-top: 2px; }
 
-/* LISTS */
-.list-item { display: flex; justify-content: space-between; align-items: flex-start; padding: 12px 0; border-bottom: 0.5px solid var(--border); }
-.list-item:last-child { border-bottom: none; }
-.list-meta { font-size: 11px; color: var(--brown); opacity: 0.6; margin-top: 3px; }
-.list-amount { text-align: right; font-size: 15px; font-weight: 600; }
-.list-sub { font-size: 11px; margin-top: 3px; opacity: 0.7; text-align: right; }
+/* ── BADGE ── */
+.badge { display: inline-flex; align-items: center; padding: 2px 8px; border-radius: 99px; font-size: 11px; font-weight: 500; }
+.bg-green { background: var(--green-bg); color: var(--green); }
+.bg-red   { background: var(--red-bg);   color: var(--red); }
+.bg-amber { background: var(--amber-bg); color: var(--amber); }
+.bg-blue  { background: var(--blue-bg);  color: var(--blue); }
+.bg-brown { background: var(--caramel-light); color: var(--brown); }
 
-/* PROGRESS */
-.progress-wrap { background: var(--border); border-radius: 99px; height: 7px; overflow: hidden; margin-top: 8px; }
-.progress-bar { height: 100%; border-radius: 99px; transition: width .5s ease; }
+/* ── PROGRESS ── */
+.prog-wrap { background: var(--border); border-radius: 99px; height: 7px; overflow: hidden; margin-top: 6px; }
+.prog-bar  { height: 100%; border-radius: 99px; transition: width .5s ease; }
 
-/* DIVIDER */
-.divider { border: none; border-top: 0.5px solid var(--border); margin: 14px 0; }
+/* ── SECTION TITLE ── */
+.stitle { font-size: 10px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase; color: var(--caramel); margin: 18px 0 8px; }
 
-/* ALERT */
-.alert { padding: 12px 14px; border-radius: var(--radius-sm); font-size: 13px; line-height: 1.5; margin-bottom: 12px; }
-.alert-green { background: var(--green-light); color: var(--green-text); border-left: 3px solid var(--green); }
-.alert-amber { background: var(--amber-light); color: var(--amber-text); border-left: 3px solid var(--amber); }
-.alert-red { background: var(--red-light); color: var(--red-text); border-left: 3px solid var(--red); }
+/* ── EMPTY ── */
+.empty { text-align: center; padding: 28px; color: var(--text2); font-size: 13px; }
 
-/* SECTION TITLE */
-.section-title { font-size: 11px; font-weight: 600; letter-spacing: 0.1em; text-transform: uppercase; color: var(--caramel); margin: 20px 0 10px; }
+/* ── ALERT ── */
+.alert { padding: 11px 14px; border-radius: 9px; font-size: 13px; line-height: 1.55; margin-bottom: 12px; }
+.al-green  { background: var(--green-bg);  color: var(--green);  border-left: 3px solid var(--green); }
+.al-red    { background: var(--red-bg);    color: var(--red);    border-left: 3px solid var(--red); }
+.al-amber  { background: var(--amber-bg);  color: var(--amber);  border-left: 3px solid var(--amber); }
 
-/* EMPTY */
-.empty { text-align: center; padding: 32px 16px; color: var(--brown); opacity: 0.55; font-size: 14px; }
+/* ── P&L TABLE ── */
+.pltable { width: 100%; border-collapse: collapse; font-size: 13px; }
+.pltable td { padding: 8px 4px; border-bottom: 0.5px solid var(--border); }
+.pltable td:last-child { text-align: right; font-weight: 500; }
+.pltable .plhead td { font-size: 10px; font-weight: 600; color: var(--caramel); letter-spacing: .08em; text-transform: uppercase; border-bottom: 1px solid var(--caramel); }
+.pltable .pltotal td { font-weight: 700; font-size: 15px; border-top: 1.5px solid var(--espresso); border-bottom: none; padding-top: 11px; }
 
-/* BAR CHART */
-.bar-chart { display: flex; align-items: flex-end; gap: 4px; height: 100px; padding-top: 8px; }
-.bar-col { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 3px; }
-.bar { width: 100%; border-radius: 4px 4px 0 0; transition: height .4s ease; min-height: 4px; }
-.bar-label { font-size: 10px; color: var(--brown); opacity: 0.6; }
-.bar-amt { font-size: 10px; font-weight: 600; color: var(--brown); }
+/* ── TOAST ── */
+#toast { position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%) translateY(60px); background: var(--espresso); color: #F5E6D3; padding: 11px 22px; border-radius: 99px; font-size: 14px; font-weight: 500; z-index: 999; transition: transform .28s ease; pointer-events: none; white-space: nowrap; }
+#toast.show { transform: translateX(-50%) translateY(0); }
 
-/* APPS SCRIPT SECTION */
-.code-block { background: var(--espresso); color: #A8D8A8; font-family: monospace; font-size: 11px; padding: 14px; border-radius: var(--radius-sm); overflow-x: auto; white-space: pre; line-height: 1.6; margin: 8px 0; }
-.step-num { width: 24px; height: 24px; border-radius: 50%; background: var(--caramel); color: var(--espresso); display: inline-flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; flex-shrink: 0; }
-.step { display: flex; gap: 12px; margin-bottom: 16px; }
-.step-body { flex: 1; }
-.step-title { font-size: 14px; font-weight: 600; margin-bottom: 4px; }
-.step-desc { font-size: 13px; color: var(--brown); opacity: 0.8; line-height: 1.5; }
+/* ── CODE BLOCK ── */
+.codeblock { background: var(--espresso); color: #A9DFBF; font-family: monospace; font-size: 11px; padding: 13px; border-radius: 9px; overflow-x: auto; white-space: pre; line-height: 1.65; margin: 8px 0; }
 
-/* P&L TABLE */
-.pl-table { width: 100%; border-collapse: collapse; font-size: 13px; }
-.pl-table td { padding: 9px 4px; border-bottom: 0.5px solid var(--border); }
-.pl-table td:last-child { text-align: right; font-weight: 500; }
-.pl-table .pl-header td { font-weight: 600; font-size: 12px; color: var(--caramel); text-transform: uppercase; letter-spacing: 0.06em; border-bottom: 1px solid var(--caramel); }
-.pl-table .pl-total td { font-weight: 700; font-size: 15px; border-top: 1.5px solid var(--espresso); border-bottom: none; padding-top: 12px; }
+/* ── SETUP STEPS ── */
+.sstep { display: flex; gap: 12px; margin-bottom: 16px; align-items: flex-start; }
+.snum { width: 26px; height: 26px; border-radius: 50%; background: var(--espresso); color: var(--caramel); font-size: 12px; font-weight: 700; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.stitle2 { font-size: 14px; font-weight: 600; margin-bottom: 3px; }
+.sdesc { font-size: 13px; color: var(--text2); line-height: 1.6; }
 
-/* TOAST */
-.toast { position: fixed; bottom: 24px; left: 50%; transform: translateX(-50%) translateY(80px); background: var(--espresso); color: var(--cream); padding: 12px 22px; border-radius: 99px; font-size: 14px; font-weight: 500; z-index: 999; transition: transform .3s ease; pointer-events: none; white-space: nowrap; }
-.toast.show { transform: translateX(-50%) translateY(0); }
-
-/* MONTH NAV */
-.month-nav { display: flex; align-items: center; gap: 8px; margin-bottom: 16px; }
-.month-nav select { flex: 1; }
-.month-nav button { width: 36px; height: 36px; border-radius: var(--radius-sm); border: 1px solid var(--border); background: var(--foam); color: var(--brown); font-size: 16px; cursor: pointer; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-
-/* SYNC STATUS */
-.sync-badge { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; padding: 4px 10px; border-radius: 99px; }
-.sync-dot { width: 6px; height: 6px; border-radius: 50%; }
-.sync-ok { background: var(--green-light); color: var(--green-text); }
-.sync-ok .sync-dot { background: var(--green); }
-.sync-warn { background: var(--amber-light); color: var(--amber-text); }
-.sync-warn .sync-dot { background: var(--amber); }
+/* ── BAR CHART ── */
+.barchart { display: flex; align-items: flex-end; gap: 5px; height: 90px; padding-top: 4px; }
+.bcol { flex: 1; display: flex; flex-direction: column; align-items: center; gap: 4px; }
+.bbar { width: 100%; border-radius: 4px 4px 0 0; min-height: 4px; transition: height .4s ease; }
+.blabel { font-size: 10px; color: var(--text2); }
 </style>
 </head>
 <body>
 
+<!-- NAV -->
 <nav class="nav">
-  <div class="nav-brand">
-    <h1>BAR CAFE</h1>
-    <span>ระบบบัญชีร้าน</span>
+  <div class="nav-top">
+    <div class="nav-logo">BAR CAFE <span>ระบบบัญชีร้าน</span></div>
+    <div class="sync-pill sync-off" id="syncPill">
+      <div class="sync-dot"></div>
+      <span id="syncTxt">ยังไม่เชื่อม</span>
+    </div>
   </div>
   <div class="nav-tabs">
-    <button class="nav-tab" onclick="showPage(&#39;dashboard&#39;,this)">ภาพรวม</button>
-    <button class="nav-tab" onclick="showPage(&#39;income&#39;,this)">รายได้</button>
-    <button class="nav-tab" onclick="showPage(&#39;expense&#39;,this)">รายจ่าย</button>
-    <button class="nav-tab" onclick="showPage(&#39;report&#39;,this)">รายงาน</button>
-    <button class="nav-tab active" onclick="showPage(&#39;setup&#39;,this)">ตั้งค่า</button>
+    <button class="ntab active" onclick="go('dash',this)">ภาพรวม</button>
+    <button class="ntab" onclick="go('income',this)">รายได้</button>
+    <button class="ntab" onclick="go('expense',this)">รายจ่าย</button>
+    <button class="ntab" onclick="go('report',this)">รายงาน</button>
+    <button class="ntab" onclick="go('setup',this)">ตั้งค่า</button>
   </div>
 </nav>
 
-<!-- ======== DASHBOARD ======== -->
-<div id="page-dashboard" class="page">
-  <div style="display:flex;justify-content:space-between;align-items:center;margin:4px 0 14px;">
-    <div style="font-size:13px;color:var(--brown);opacity:0.7" id="dash-date">ศ 20 มี.ค. 2569</div>
-    <div class="sync-badge sync-ok" id="sync-status">
-      <div class="sync-dot"></div>
-      <span id="sync-text">เชื่อม Sheets แล้ว</span>
-    </div>
+<!-- ════ DASHBOARD ════ -->
+<div id="dash" class="page on">
+  <div style="font-size:12px;color:var(--text2);margin:2px 0 12px" id="dashDate"></div>
+  <div class="grid2">
+    <div class="mcard"><div class="mlabel">รายได้เดือนนี้</div><div class="mval c-green" id="dInc">฿0</div><div class="msub" id="dIncSub">0 วัน</div></div>
+    <div class="mcard"><div class="mlabel">รายจ่ายเดือนนี้</div><div class="mval c-red" id="dExp">฿0</div></div>
+    <div class="mcard"><div class="mlabel">กำไร / ขาดทุน</div><div class="mval" id="dProfit">฿0</div><div class="msub" id="dMargin">Margin 0%</div></div>
+    <div class="mcard"><div class="mlabel">เฉลี่ย/วัน</div><div class="mval c-amber" id="dAvg">฿0</div><div class="msub">เป้า ฿3,300</div></div>
   </div>
-
-  <div class="metrics" id="dash-metrics">
-    <div class="metric">
-      <div class="metric-label">รายได้เดือนนี้</div>
-      <div class="metric-value v-green" id="d-income">฿55,064</div>
-      <div class="metric-sub v-green" id="d-income-sub">บันทึก 20 วัน</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">รายจ่ายเดือนนี้</div>
-      <div class="metric-value v-red" id="d-expense">฿69,866</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">กำไร / ขาดทุน</div>
-      <div class="metric-value v-red" id="d-profit">฿-14,802</div>
-      <div class="metric-sub" id="d-margin">Margin -27%</div>
-    </div>
-    <div class="metric">
-      <div class="metric-label">เฉลี่ย/วัน</div>
-      <div class="metric-value v-amber" id="d-avg">฿2,753</div>
-      <div class="metric-sub">เป้า ฿3,300</div>
-    </div>
-  </div>
-
   <div class="card">
-    <div class="card-title">เทียบเป้ารายเดือน</div>
-    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:6px">
-      <span id="target-label">เป้า ฿102,300</span>
-      <span id="target-pct" style="font-weight:600">54%</span>
+    <div class="card-label">เทียบเป้ารายเดือน</div>
+    <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+      <span id="targetLbl">เป้า ฿0</span><span id="targetPct" style="font-weight:600">0%</span>
     </div>
-    <div class="progress-wrap">
-      <div class="progress-bar" id="target-bar" style="width: 54%; background: var(--amber);"></div>
-    </div>
-    <p id="target-note" style="font-size:12px;color:var(--brown);opacity:0.6;margin-top:8px">บันทึกแล้ว 20/31 วัน · เฉลี่ย ฿2,753/วัน</p>
+    <div class="prog-wrap"><div class="prog-bar" id="targetBar" style="width:0%;background:var(--green)"></div></div>
+    <p id="targetNote" style="font-size:11px;color:var(--text2);margin-top:7px"></p>
   </div>
-
   <div class="card">
-    <div class="card-title">ยอดขาย 7 วันล่าสุด</div>
-    <div class="bar-chart" id="week-chart"><div class="bar-col">
-      <div class="bar-amt">5k</div>
-      <div class="bar" style="height:80px;background:var(--green)"></div>
-      <div class="bar-label">ส</div>
-    </div><div class="bar-col">
-      <div class="bar-amt">4k</div>
-      <div class="bar" style="height:69px;background:var(--green)"></div>
-      <div class="bar-label">อา</div>
-    </div><div class="bar-col">
-      <div class="bar-amt">2k</div>
-      <div class="bar" style="height:37px;background:var(--amber)"></div>
-      <div class="bar-label">จ</div>
-    </div><div class="bar-col">
-      <div class="bar-amt">2k</div>
-      <div class="bar" style="height:33px;background:var(--red)"></div>
-      <div class="bar-label">อ</div>
-    </div><div class="bar-col">
-      <div class="bar-amt">2k</div>
-      <div class="bar" style="height:32px;background:var(--red)"></div>
-      <div class="bar-label">พ</div>
-    </div><div class="bar-col">
-      <div class="bar-amt">2k</div>
-      <div class="bar" style="height:34px;background:var(--red)"></div>
-      <div class="bar-label">พฤ</div>
-    </div><div class="bar-col">
-      <div class="bar-amt">0k</div>
-      <div class="bar" style="height:8px;background:var(--red)"></div>
-      <div class="bar-label">ศ</div>
-    </div></div>
+    <div class="card-label">ยอดขาย 7 วันล่าสุด</div>
+    <div class="barchart" id="weekChart"></div>
   </div>
-
-  <div class="section-title">วันนี้ยังไม่ได้บันทึก?</div>
-  <button class="btn-primary" onclick="showPage(&#39;income&#39;,document.querySelectorAll(&#39;.nav-tab&#39;)[1])">+ บันทึกยอดขายวันนี้</button>
+  <button class="btn-main" onclick="go('income',document.querySelectorAll('.ntab')[1])">+ บันทึกยอดขายวันนี้</button>
 </div>
 
-<!-- ======== INCOME ======== -->
-<div id="page-income" class="page">
+<!-- ════ INCOME ════ -->
+<div id="income" class="page">
   <div class="card">
-    <div class="card-title">บันทึกยอดขาย</div>
-    <div class="field-row">
-      <div class="field">
-        <label>วันที่</label>
-        <input type="date" id="inc-date">
-      </div>
-      <div class="field">
-        <label>จำนวนลูกค้า</label>
-        <input type="number" id="inc-cust" placeholder="เช่น 45" min="0">
-      </div>
+    <div class="card-label">บันทึกยอดขาย</div>
+    <div class="row2">
+      <div class="field"><label>วันที่</label><input type="date" id="iDate"></div>
+      <div class="field"><label>จำนวนลูกค้า</label><input type="number" id="iCust" placeholder="เช่น 45" min="0" inputmode="numeric"></div>
     </div>
+    <div class="field"><label>ยอดขายรวม (บาท)</label><input type="number" id="iAmt" placeholder="0" min="0" inputmode="decimal"></div>
     <div class="field">
-      <label>ยอดขายรวม (บาท)</label>
-      <input type="number" id="inc-amt" placeholder="0" min="0" inputmode="decimal">
-    </div>
-    <div class="field">
-      <label>ประเภทลูกค้าหลัก</label>
-      <select id="inc-type">
-        <option value="นักกอล์ฟ">นักกอล์ฟเป็นส่วนใหญ่</option>
-        <option value="ทั่วไป">ลูกค้าทั่วไปเป็นส่วนใหญ่</option>
+      <label>ลูกค้าส่วนใหญ่</label>
+      <select id="iType">
+        <option value="นักกอล์ฟ">นักกอล์ฟ</option>
+        <option value="ทั่วไป">ลูกค้าทั่วไป</option>
         <option value="ผสม">ผสม</option>
       </select>
     </div>
-    <div class="field">
-      <label>หมายเหตุ</label>
-      <textarea id="inc-note" placeholder="เช่น วันหยุดนักขัตฤกษ์ / ฝนตกทั้งวัน / มีทัวร์นาเมนต์..."></textarea>
-    </div>
-    <button class="btn-primary" onclick="saveIncome()">บันทึกยอดขาย</button>
+    <div class="field"><label>หมายเหตุ</label><textarea id="iNote" placeholder="เช่น วันหยุด / ฝนตก / มีทัวร์นาเมนต์..."></textarea></div>
+    <button class="btn-main" onclick="saveIncome()">บันทึกยอดขาย</button>
   </div>
-
-  <div class="section-title">ประวัติล่าสุด</div>
-  <div class="card" id="income-list"><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">ศ 20/3/2569</div>
-        <div class="list-meta">50 คน · ฿0/คน</div>
-        <div class="list-meta">Test</div>
-      </div>
-      <div>
-        <div class="list-amount v-green">฿20</div>
-        <div class="list-sub" style="color:var(--red)">กำไร ฿-53,922</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-20&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">พฤ 19/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿2,151</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿2,151</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-19&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">พ 18/3/2569</div>
-        <div class="list-meta">30 คน · ฿68/คน</div>
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿2,035</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿2,035</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-18&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">อ 17/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿2,111</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿2,111</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-17&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">จ 16/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿2,342</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿2,342</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-16&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">อา 15/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿4,380</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿4,380</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-15&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">ส 14/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿5,048</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿5,048</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-14&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">ศ 13/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿2,975</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿2,975</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-13&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">พฤ 12/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿2,960</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿2,960</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-12&#39;)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:14px;font-weight:500">พ 11/3/2569</div>
-        
-        
-      </div>
-      <div>
-        <div class="list-amount v-green">฿1,921</div>
-        <div class="list-sub" style="color:var(--green)">กำไร ฿1,921</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome(&#39;2026-03-11&#39;)">ลบ</button></div>
-      </div>
-    </div></div>
+  <div class="stitle">ประวัติล่าสุด</div>
+  <div class="card" id="incomeList"><div class="empty">ยังไม่มีข้อมูล</div></div>
 </div>
 
-<!-- ======== EXPENSE ======== -->
-<div id="page-expense" class="page">
+<!-- ════ EXPENSE ════ -->
+<div id="expense" class="page">
   <div class="card">
-    <div class="card-title">บันทึกรายจ่าย</div>
-    <div class="field-row">
-      <div class="field">
-        <label>วันที่</label>
-        <input type="date" id="exp-date">
-      </div>
+    <div class="card-label">บันทึกรายจ่าย</div>
+    <div class="row2">
+      <div class="field"><label>วันที่</label><input type="date" id="eDate"></div>
       <div class="field">
         <label>หมวดหมู่</label>
-        <select id="exp-cat">
+        <select id="eCat">
           <option value="วัตถุดิบ">วัตถุดิบ</option>
           <option value="ค่าแรง">ค่าแรงพนักงาน</option>
           <option value="ค่าเช่า">ค่าเช่า/สนาม</option>
@@ -432,913 +237,531 @@ body { font-family: 'Sarabun', sans-serif; background: var(--cream); color: var(
         </select>
       </div>
     </div>
-    <div class="field">
-      <label>รายละเอียด</label>
-      <input type="text" id="exp-desc" placeholder="เช่น เมล็ดกาแฟ 1 kg, ค่าแรงรายวัน">
-    </div>
-    <div class="field">
-      <label>จำนวนเงิน (บาท)</label>
-      <input type="number" id="exp-amt" placeholder="0" min="0" inputmode="decimal">
-    </div>
-    <button class="btn-primary" onclick="saveExpense()">บันทึกรายจ่าย</button>
+    <div class="field"><label>รายละเอียด</label><input type="text" id="eDesc" placeholder="เช่น เมล็ดกาแฟ 1kg / ค่าแรงรายวัน"></div>
+    <div class="field"><label>จำนวนเงิน (บาท)</label><input type="number" id="eAmt" placeholder="0" min="0" inputmode="decimal"></div>
+    <button class="btn-main" onclick="saveExpense()">บันทึกรายจ่าย</button>
   </div>
-
-  <div class="section-title">รายจ่ายล่าสุด</div>
-  <div class="card" id="expense-list"><div class="list-item">
-      <div>
-        <span class="badge badge-blue">อื่นๆ</span>
-        <div class="list-meta" style="margin-top:5px">คืนเงินลงทุน · อ 31/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿10,000</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773985762616)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <span class="badge badge-blue">ค่าแรง</span>
-        <div class="list-meta" style="margin-top:5px">- · ศ 20/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿30,000</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773985187654)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <span class="badge badge-green">วัตถุดิบ</span>
-        <div class="list-meta" style="margin-top:5px">รวมถึงวันที่ 19 · ศ 20/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿22,042</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773985560427)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <span class="badge badge-amber">ซ่อมบำรุง</span>
-        <div class="list-meta" style="margin-top:5px">- · ศ 20/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿500</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773985581242)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <span class="badge badge-blue">อื่นๆ</span>
-        <div class="list-meta" style="margin-top:5px">ค่าการตลาด · ศ 20/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿1,400</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773985604994)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <span class="badge badge-amber">ค่าเช่า</span>
-        <div class="list-meta" style="margin-top:5px">- · อา 1/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿5,000</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773983790980)">ลบ</button></div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <span class="badge badge-red">ค่าไฟน้ำ</span>
-        <div class="list-meta" style="margin-top:5px">- · อา 1/3/2569</div>
-      </div>
-      <div>
-        <div class="list-amount v-red">−฿924</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(1773983856732)">ลบ</button></div>
-      </div>
-    </div></div>
+  <div class="stitle">รายจ่ายล่าสุด</div>
+  <div class="card" id="expenseList"><div class="empty">ยังไม่มีข้อมูล</div></div>
 </div>
 
-<!-- ======== REPORT ======== -->
-<div id="page-report" class="page">
-  <div class="month-nav">
-    <button onclick="changeMonth(-1)">‹</button>
-    <select id="month-sel" onchange="renderReport()"><option value="2026-03" selected="">มี.ค. 2569</option></select>
-    <button onclick="changeMonth(1)">›</button>
+<!-- ════ REPORT ════ -->
+<div id="report" class="page">
+  <div style="display:flex;align-items:center;gap:8px;margin-bottom:14px">
+    <button class="btn-sm" onclick="shiftMonth(-1)">‹</button>
+    <select id="monthSel" onchange="renderReport()" style="flex:1;padding:8px 12px;font-size:14px;border-radius:9px;border:1px solid var(--border);background:var(--card);font-family:Sarabun,sans-serif"></select>
+    <button class="btn-sm" onclick="shiftMonth(1)">›</button>
   </div>
-
-  <div id="report-alert"><div class="alert alert-red">ขาดทุน ฿14,802 · ยอดขายต่ำกว่าเป้า ฿47,236</div></div>
-
+  <div id="reportAlert"></div>
+  <div class="card"><div class="card-label">งบกำไร-ขาดทุน</div><table class="pltable" id="plTable"></table></div>
+  <div class="card"><div class="card-label">รายจ่ายแยกหมวด</div><div id="expBreak"></div></div>
   <div class="card">
-    <div class="card-title">งบกำไร-ขาดทุน (P&amp;L)</div>
-    <table class="pl-table" id="pl-table">
-    <tbody><tr class="pl-header"><td>รายการ</td><td></td><td>บาท</td></tr>
-    <tr><td colspan="2">รายได้รวม</td><td style="color:var(--green)">฿55,064</td></tr>
-    <tr><td colspan="3" style="padding-top:10px;font-size:11px;font-weight:600;color:var(--caramel);letter-spacing:.06em">รายจ่าย</td></tr>
-    <tr><td></td><td style="color:var(--brown)">วัตถุดิบ</td><td style="color:var(--red)">−฿22,042</td></tr><tr><td></td><td style="color:var(--brown)">ค่าแรง</td><td style="color:var(--red)">−฿30,000</td></tr><tr><td></td><td style="color:var(--brown)">ค่าเช่า</td><td style="color:var(--red)">−฿5,000</td></tr><tr><td></td><td style="color:var(--brown)">ค่าไฟน้ำ</td><td style="color:var(--red)">−฿924</td></tr><tr><td></td><td style="color:var(--brown)">ซ่อมบำรุง</td><td style="color:var(--red)">−฿500</td></tr><tr><td></td><td style="color:var(--brown)">อื่นๆ</td><td style="color:var(--red)">−฿11,400</td></tr>
-    <tr><td colspan="2">รวมรายจ่าย</td><td style="color:var(--red)">−฿69,866</td></tr>
-    <tr class="pl-total"><td colspan="2">กำไร / ขาดทุน</td><td style="color:var(--red)">฿-14,802</td></tr>
-  </tbody></table>
-  </div>
-
-  <div class="card">
-    <div class="card-title">รายจ่ายแยกหมวด</div>
-    <div id="exp-breakdown"><div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge badge-green" style="margin-right:6px">วัตถุดิบ</span></span>
-          <span style="font-weight:600;color:var(--red)">฿22,042 <span style="font-weight:400;color:var(--brown);opacity:.6">(32%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:32%;background:var(--caramel)"></div></div>
-      </div><div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge badge-blue" style="margin-right:6px">ค่าแรง</span></span>
-          <span style="font-weight:600;color:var(--red)">฿30,000 <span style="font-weight:400;color:var(--brown);opacity:.6">(43%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:43%;background:var(--caramel)"></div></div>
-      </div><div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge badge-amber" style="margin-right:6px">ค่าเช่า</span></span>
-          <span style="font-weight:600;color:var(--red)">฿5,000 <span style="font-weight:400;color:var(--brown);opacity:.6">(7%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:7%;background:var(--caramel)"></div></div>
-      </div><div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge badge-red" style="margin-right:6px">ค่าไฟน้ำ</span></span>
-          <span style="font-weight:600;color:var(--red)">฿924 <span style="font-weight:400;color:var(--brown);opacity:.6">(1%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:1%;background:var(--caramel)"></div></div>
-      </div><div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge badge-amber" style="margin-right:6px">ซ่อมบำรุง</span></span>
-          <span style="font-weight:600;color:var(--red)">฿500 <span style="font-weight:400;color:var(--brown);opacity:.6">(1%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:1%;background:var(--caramel)"></div></div>
-      </div><div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge badge-blue" style="margin-right:6px">อื่นๆ</span></span>
-          <span style="font-weight:600;color:var(--red)">฿11,400 <span style="font-weight:400;color:var(--brown);opacity:.6">(16%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:16%;background:var(--caramel)"></div></div>
-      </div></div>
-  </div>
-
-  <div class="card">
-    <div class="card-title" style="display:flex;justify-content:space-between;align-items:center">
-      <span>รายละเอียดรายวัน</span>
-      <button class="btn-secondary" onclick="exportCSV()">⬇ Export CSV</button>
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="card-label" style="margin:0">รายละเอียดรายวัน</div>
+      <button class="btn-sm" onclick="exportCSV()">⬇ CSV</button>
     </div>
-    <div id="daily-detail"><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">ศ 20/3/2569</div>
-        <div class="list-meta">Test</div>
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿20</div>
-        <div style="text-align:right;font-size:12px;color:var(--red)">฿-53,922</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">พฤ 19/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,151</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,151</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">พ 18/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,035</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,035</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">อ 17/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,111</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,111</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">จ 16/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,342</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,342</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">อา 15/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿4,380</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿4,380</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">ส 14/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿5,048</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿5,048</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">ศ 13/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,975</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,975</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">พฤ 12/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,960</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,960</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">พ 11/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿1,921</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿1,921</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">อ 10/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,027</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,027</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">จ 9/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿2,960</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿2,960</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">อา 8/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿3,000</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿3,000</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">ส 7/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿4,143</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿4,143</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">ศ 6/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿3,805</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿3,805</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">พฤ 5/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿1,710</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿1,710</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">พ 4/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿3,759</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿3,759</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">อ 3/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿3,012</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿3,012</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">จ 2/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿1,410</div>
-        <div style="text-align:right;font-size:12px;color:var(--green)">+฿1,410</div>
-      </div>
-    </div><div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">อา 1/3/2569</div>
-        
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">฿3,295</div>
-        <div style="text-align:right;font-size:12px;color:var(--red)">฿-2,629</div>
-      </div>
-    </div></div>
+    <div id="dailyDetail"></div>
   </div>
 </div>
 
-<!-- ======== SETUP ======== -->
-<div id="page-setup" class="page active">
+<!-- ════ SETUP ════ -->
+<div id="setup" class="page">
   <div class="card">
-    <div class="card-title">ข้อมูลร้าน</div>
-    <div class="field">
-      <label>เป้ายอดขาย/วัน (บาท)</label>
-      <input type="number" id="cfg-target" value="3300" min="0">
-    </div>
-    <div class="field">
-      <label>ค่าเช่าคงที่/เดือน (บาท)</label>
-      <input type="number" id="cfg-rent" value="0" min="0">
-      <div class="hint">ใส่ถ้ามีค่าเช่าคงที่ทุกเดือน</div>
-    </div>
-    <button class="btn-primary" onclick="saveConfig()">บันทึกการตั้งค่า</button>
+    <div class="card-label">ตั้งค่าร้าน</div>
+    <div class="field"><label>เป้ายอดขาย/วัน (บาท)</label><input type="number" id="cfgTarget" value="3300"></div>
+    <button class="btn-main" onclick="saveCfg()">บันทึกการตั้งค่า</button>
   </div>
 
   <div class="card">
-    <div class="card-title">เชื่อมต่อ Google Sheets</div>
+    <div class="card-label">เชื่อมต่อ Google Sheets</div>
     <div class="field">
-      <label>Google Apps Script URL</label>
-      <input type="text" id="cfg-url" placeholder="https://script.google.com/macros/s/.../exec">
+      <label>Apps Script URL</label>
+      <input type="url" id="cfgUrl" placeholder="https://script.google.com/macros/s/.../exec">
       <div class="hint">วาง URL จาก Apps Script ที่ Deploy แล้ว</div>
     </div>
-    <button class="btn-primary" onclick="saveScriptUrl()">บันทึก URL</button>
+    <div style="display:flex;gap:8px">
+      <button class="btn-main" style="flex:1" onclick="saveUrl()">บันทึก URL</button>
+      <button class="btn-sm" onclick="testSync()">ทดสอบ</button>
+    </div>
+    <div id="syncResult" style="margin-top:10px;font-size:13px"></div>
   </div>
 
-  <div class="section-title">วิธีเชื่อม Google Sheets (ทำครั้งเดียว)</div>
-
+  <div class="stitle">Apps Script Code (วางใน Google Sheets)</div>
   <div class="card">
-    <div class="step">
-      <div class="step-num">1</div>
-      <div class="step-body">
-        <div class="step-title">เปิด Google Sheets ของคุณ</div>
-        <div class="step-desc">เปิดไฟล์ Sheets ที่ใช้งานอยู่ แล้วไปที่เมนู <strong>Extensions → Apps Script</strong></div>
-      </div>
+    <div class="sstep"><div class="snum">1</div><div><div class="stitle2">เปิด Google Sheets → Extensions → Apps Script</div><div class="sdesc">เปิดจากในไฟล์ Sheets ที่ต้องการบันทึกข้อมูล</div></div></div>
+    <div class="sstep"><div class="snum">2</div><div><div class="stitle2">ลบ Code เดิมทั้งหมด แล้ววาง Code นี้แทน</div></div></div>
+    <div class="codeblock" id="scriptDisplay"></div>
+    <button class="btn-sm" style="width:100%;margin-top:4px" onclick="copyScript()">คัดลอก Code</button>
+    <div class="sstep" style="margin-top:16px"><div class="snum">3</div><div><div class="stitle2">Deploy → New deployment</div><div class="sdesc">Type: Web App · Execute as: <b>Me</b> · Who has access: <b>Anyone</b> → Deploy → คัดลอก URL</div></div></div>
+    <div class="sstep"><div class="snum">4</div><div><div class="stitle2">วาง URL ในช่องด้านบน แล้วกด "บันทึก URL"</div></div></div>
+  </div>
+
+  <div class="card" style="margin-top:4px">
+    <div class="card-label">ข้อมูลในเครื่อง</div>
+    <div style="display:flex;gap:8px;flex-wrap:wrap">
+      <button class="btn-sm" onclick="exportJSON()">⬇ Backup JSON</button>
+      <button class="btn-sm" style="color:var(--red)" onclick="clearData()">ล้างข้อมูลทั้งหมด</button>
     </div>
-    <div class="step">
-      <div class="step-num">2</div>
-      <div class="step-body">
-        <div class="step-title">วาง Code นี้ลงใน Apps Script</div>
-        <div class="step-desc">ลบ Code เดิมทั้งหมดออก แล้ววาง Code ด้านล่างนี้แทน</div>
-        <div class="code-block" id="apps-script-code">// BAR CAFE — Google Apps Script
-// วางใน Extensions &gt; Apps Script แล้ว Deploy เป็น Web App
+  </div>
+</div>
+
+<div id="toast"></div>
+
+<script>
+// ─── CONSTANTS ───
+const CATS = ['วัตถุดิบ','ค่าแรง','ค่าเช่า','ค่าไฟน้ำ','ซ่อมบำรุง','อื่นๆ'];
+const CAT_CLS = ['bg-green','bg-blue','bg-amber','bg-red','bg-brown','bg-blue'];
+const DAY = ['อา','จ','อ','พ','พฤ','ศ','ส'];
+const MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
+
+// ─── APPS SCRIPT CODE ───
+const SCRIPT = `// BAR CAFE — Apps Script v3
+// Extensions > Apps Script > วาง Code นี้ > Deploy > New deployment
+// Type: Web App | Execute as: Me | Who has access: Anyone
+
+const SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
+
+function doGet(e) {
+  return respond(handleData(e.parameter));
+}
 
 function doPost(e) {
+  let params;
+  try { params = JSON.parse(e.postData.contents); }
+  catch(_) { params = e.parameter; }
+  return respond(handleData(params));
+}
+
+function handleData(p) {
+  if (!p || !p.type) return { ok: true, msg: "Script is live" };
+  const ss = SpreadsheetApp.openById(SHEET_ID);
+  const type = p.type;
+  const d = typeof p.data === 'string' ? JSON.parse(p.data) : p.data;
+
+  if (type === "income") {
+    const name = monthSheet(d.date);
+    let sh = ss.getSheetByName(name);
+    if (!sh) {
+      sh = ss.insertSheet(name);
+      const h = sh.getRange(1,1,1,6);
+      h.setValues([["วันที่","ยอดขาย","จำนวนลูกค้า","ลูกค้า","หมายเหตุ","อัปเดต"]]);
+      h.setFontWeight("bold").setBackground("#1E110A").setFontColor("#B8834A");
+    }
+    const rows = sh.getDataRange().getValues();
+    const idx = rows.findIndex(r => r[0] === d.date);
+    const row = [d.date, +d.amount, +(d.customers||0), d.type||"", d.note||"", new Date().toLocaleString("th-TH")];
+    if (idx > 0) sh.getRange(idx+1,1,1,6).setValues([row]);
+    else sh.appendRow(row);
+  }
+
+  if (type === "expense") {
+    const name = monthSheet(d.date) + "_รายจ่าย";
+    let sh = ss.getSheetByName(name);
+    if (!sh) {
+      sh = ss.insertSheet(name);
+      const h = sh.getRange(1,1,1,5);
+      h.setValues([["วันที่","หมวด","รายละเอียด","จำนวนเงิน","อัปเดต"]]);
+      h.setFontWeight("bold").setBackground("#1E110A").setFontColor("#B8834A");
+    }
+    sh.appendRow([d.date, d.cat, d.desc||"", +d.amount, new Date().toLocaleString("th-TH")]);
+  }
+
+  return { ok: true };
+}
+
+function respond(data) {
+  return ContentService
+    .createTextOutput(JSON.stringify(data))
+    .setMimeType(ContentService.MimeType.JSON);
+}
+
+function monthSheet(dateStr) {
+  const d = new Date(dateStr);
+  const m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  return m[d.getMonth()] + String(d.getFullYear()).slice(2);
+}`;
+
+// ─── STORAGE ───
+const db = {
+  get: (k, def=[]) => { try { return JSON.parse(localStorage.getItem(k)) ?? def; } catch { return def; } },
+  set: (k,v) => localStorage.setItem(k, JSON.stringify(v))
+};
+
+// ─── HELPERS ───
+const fmt   = n => '฿' + Math.round(n).toLocaleString('th-TH');
+const today = () => new Date().toISOString().slice(0,10);
+const dStr  = s => { const d = new Date(s+'T00:00:00'); return DAY[d.getDay()]+' '+d.getDate()+'/'+(d.getMonth()+1); };
+const cfg   = () => db.get('cafe_cfg', {target:3300, scriptUrl:''});
+
+function toast(msg, dur=2400) {
+  const el = document.getElementById('toast');
+  el.textContent = msg; el.classList.add('show');
+  setTimeout(() => el.classList.remove('show'), dur);
+}
+
+// ─── SYNC ───
+async function syncToSheets(type, data) {
+  const url = cfg().scriptUrl;
+  if (!url) return false;
   try {
-    const body = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const type = body.type;
-    const data = body.data;
-
-    if (type === 'income') {
-      // เขียนลงชีตรายเดือน เช่น Jan26, Feb26
-      const sheetName = getMonthSheet(data.date);
-      let sheet = ss.getSheetByName(sheetName);
-      if (!sheet) {
-        sheet = ss.insertSheet(sheetName);
-        sheet.appendRow(['วันที่','ยอดขาย','จำนวนลูกค้า','ประเภทลูกค้า','หมายเหตุ']);
-        sheet.getRange(1,1,1,5).setFontWeight('bold');
-      }
-      // ตรวจสอบว่ามีวันนั้นแล้วหรือยัง
-      const vals = sheet.getDataRange().getValues();
-      const rowIdx = vals.findIndex(r =&gt; r[0] === data.date);
-      const row = [data.date, data.amount, data.customers||0, data.type||'', data.note||''];
-      if (rowIdx &gt; 0) {
-        sheet.getRange(rowIdx+1, 1, 1, 5).setValues([row]);
-      } else {
-        sheet.appendRow(row);
-      }
-    }
-
-    if (type === 'expense') {
-      const sheetName = getMonthSheet(data.date) + '_expense';
-      let sheet = ss.getSheetByName(sheetName);
-      if (!sheet) {
-        sheet = ss.insertSheet(sheetName);
-        sheet.appendRow(['วันที่','หมวด','รายละเอียด','จำนวนเงิน']);
-        sheet.getRange(1,1,1,4).setFontWeight('bold');
-      }
-      sheet.appendRow([data.date, data.cat, data.desc||'', data.amount]);
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ok: true}))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ok: false, error: err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
+    // ใช้ no-cors mode — ส่งข้อมูลได้แต่ไม่รับ response กลับ (นี่คือวิธีที่ถูกต้องสำหรับ Apps Script)
+    await fetch(url, {
+      method: 'POST',
+      mode: 'no-cors',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, data })
+    });
+    return true;
+  } catch(e) {
+    console.warn('sync error', e);
+    return false;
   }
 }
 
-function getMonthSheet(dateStr) {
-  const d = new Date(dateStr);
-  const months = ['Jan','Feb','Mar','Apr','May','Jun',
-                  'Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[d.getMonth()] + String(d.getFullYear()).slice(2);
-}</div>
-        <button class="btn-secondary" style="margin-top:8px;width:100%" onclick="copyScript()">คัดลอก Code</button>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">3</div>
-      <div class="step-body">
-        <div class="step-title">Deploy เป็น Web App</div>
-        <div class="step-desc">กด <strong>Deploy → New deployment</strong> → เลือก <strong>Web App</strong> → Execute as: <strong>Me</strong> → Who has access: <strong>Anyone</strong> → กด Deploy → Copy URL</div>
-      </div>
-    </div>
-    <div class="step">
-      <div class="step-num">4</div>
-      <div class="step-body">
-        <div class="step-title">วาง URL ในช่องด้านบน</div>
-        <div class="step-desc">นำ URL ที่ได้มาวางในช่อง "Google Apps Script URL" แล้วกด บันทึก ระบบจะส่งข้อมูลเข้า Sheets อัตโนมัติทุกครั้งที่บันทึก</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="card">
-    <div class="card-title">ข้อมูลในเครื่อง</div>
-    <div style="display:flex;gap:8px;flex-wrap:wrap">
-      <button class="btn-secondary" onclick="exportAll()">⬇ Export ข้อมูลทั้งหมด (JSON)</button>
-      <button class="btn-secondary" style="color:var(--red)" onclick="clearAll()">ล้างข้อมูลทั้งหมด</button>
-    </div>
-  </div>
-</div>
-
-<!-- TOAST -->
-<div class="toast" id="toast">บันทึก URL แล้ว — ทดสอบกรอกข้อมูลดูได้เลย</div>
-
-<script>
-const CATS = ['วัตถุดิบ','ค่าแรง','ค่าเช่า','ค่าไฟน้ำ','ซ่อมบำรุง','อื่นๆ'];
-const CAT_BADGE = ['badge-green','badge-blue','badge-amber','badge-red','badge-amber','badge-blue'];
-const DAY_TH = ['อา','จ','อ','พ','พฤ','ศ','ส'];
-const MONTH_TH = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
-
-function load(k, def=[]) { try { return JSON.parse(localStorage.getItem(k))||def; } catch(e){ return def; } }
-function save(k,v) { localStorage.setItem(k,JSON.stringify(v)); }
-function fmt(n) { return '฿'+Math.round(n).toLocaleString('th-TH'); }
-function today() { return new Date().toISOString().slice(0,10); }
-function dateStr(d) {
-  const dt = new Date(d+'T00:00:00');
-  return DAY_TH[dt.getDay()]+' '+dt.getDate()+'/'+( dt.getMonth()+1)+'/'+( dt.getFullYear()+543);
-}
-function toast(msg) {
-  const el = document.getElementById('toast');
-  el.textContent = msg; el.classList.add('show');
-  setTimeout(()=>el.classList.remove('show'), 2500);
-}
-function getConfig() { return load('cafe_cfg', {target:3300, rent:0, scriptUrl:''}); }
-
-// ---- NAV ----
-function showPage(name, tab) {
-  document.querySelectorAll('.page').forEach(p=>p.classList.remove('active'));
-  document.querySelectorAll('.nav-tab').forEach(t=>t.classList.remove('active'));
-  document.getElementById('page-'+name).classList.add('active');
-  if(tab) tab.classList.add('active');
-  if(name==='dashboard') renderDashboard();
-  if(name==='report') renderReport();
-  if(name==='income') renderIncomeList();
-  if(name==='expense') renderExpenseList();
+async function testSync() {
+  const url = cfg().scriptUrl;
+  const el = document.getElementById('syncResult');
+  if (!url) { el.innerHTML = '<div class="alert al-amber">กรุณาใส่ URL ก่อน</div>'; return; }
+  el.innerHTML = '<div class="alert al-amber">กำลังทดสอบ...</div>';
+  try {
+    // ทดสอบด้วย GET request ซึ่งรับ response ได้
+    const r = await fetch(url + '?type=ping', { mode: 'cors' });
+    const j = await r.json();
+    el.innerHTML = '<div class="alert al-green">เชื่อมต่อสำเร็จ! Script ทำงานปกติ ✓</div>';
+    updateSyncBadge(true);
+  } catch(e) {
+    // no-cors ทำให้ GET ก็ error แต่ script อาจทำงานได้ — ลองส่งข้อมูลจริงแล้วเช็ค Sheets
+    el.innerHTML = '<div class="alert al-amber">ส่ง request ไปแล้ว — กรุณาเช็ค Google Sheets ว่ามีข้อมูลเข้าไหม<br>ถ้ายังไม่มี ลอง Deploy Apps Script ใหม่อีกครั้ง</div>';
+  }
 }
 
-// ---- INCOME ----
-function saveIncome() {
-  const d = document.getElementById('inc-date').value;
-  const a = parseFloat(document.getElementById('inc-amt').value);
-  const c = parseInt(document.getElementById('inc-cust').value)||0;
-  const t = document.getElementById('inc-type').value;
-  const n = document.getElementById('inc-note').value.trim();
-  if(!d || isNaN(a) || a<=0) { toast('กรุณากรอกวันที่และยอดขาย'); return; }
-  const list = load('cafe_incomes');
-  const idx = list.findIndex(i=>i.date===d);
-  const rec = {date:d, amount:a, customers:c, type:t, note:n};
-  if(idx>=0) { if(!confirm('มีข้อมูลวันนี้แล้ว แทนที่?')) return; list[idx]=rec; }
-  else list.push(rec);
-  list.sort((a,b)=>b.date.localeCompare(a.date));
-  save('cafe_incomes', list);
-  document.getElementById('inc-amt').value='';
-  document.getElementById('inc-cust').value='';
-  document.getElementById('inc-note').value='';
+function updateSyncBadge(on) {
+  const p = document.getElementById('syncPill');
+  const t = document.getElementById('syncTxt');
+  p.className = 'sync-pill ' + (on ? 'sync-on' : 'sync-off');
+  t.textContent = on ? 'เชื่อม Sheets แล้ว' : 'ยังไม่เชื่อม';
+}
+
+// ─── INCOME ───
+async function saveIncome() {
+  const date = document.getElementById('iDate').value;
+  const amt  = parseFloat(document.getElementById('iAmt').value);
+  const cust = parseInt(document.getElementById('iCust').value) || 0;
+  const type = document.getElementById('iType').value;
+  const note = document.getElementById('iNote').value.trim();
+  if (!date || isNaN(amt) || amt <= 0) { toast('กรุณากรอกวันที่และยอดขาย'); return; }
+
+  const list = db.get('cafe_incomes');
+  const idx  = list.findIndex(i => i.date === date);
+  const rec  = { date, amount: amt, customers: cust, type, note };
+  if (idx >= 0) {
+    if (!confirm('มีข้อมูลวันนี้แล้ว แทนที่?')) return;
+    list[idx] = rec;
+  } else {
+    list.push(rec);
+  }
+  list.sort((a,b) => b.date.localeCompare(a.date));
+  db.set('cafe_incomes', list);
+
+  document.getElementById('iAmt').value  = '';
+  document.getElementById('iCust').value = '';
+  document.getElementById('iNote').value = '';
+
   renderIncomeList();
-  syncToSheets('income', rec);
-  toast('บันทึกยอดขายสำเร็จ');
+  renderDash();
+
+  const synced = await syncToSheets('income', rec);
+  toast(synced ? 'บันทึกแล้ว — ส่ง Sheets แล้ว ✓' : 'บันทึกในเครื่องแล้ว (ยังไม่ได้เชื่อม Sheets)');
 }
 
 function renderIncomeList() {
-  const list = load('cafe_incomes').slice(0,10);
-  const expenses = load('cafe_expenses');
-  const el = document.getElementById('income-list');
-  if(!list.length){ el.innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>'; return; }
-  el.innerHTML = list.map(i=>{
-    const dayExp = expenses.filter(e=>e.date===i.date).reduce((s,e)=>s+e.amount,0);
-    const p = i.amount - dayExp;
-    return `<div class="list-item">
+  const list = db.get('cafe_incomes').slice(0, 10);
+  const exps = db.get('cafe_expenses');
+  const el   = document.getElementById('incomeList');
+  if (!list.length) { el.innerHTML = '<div class="empty">ยังไม่มีข้อมูล</div>'; return; }
+  el.innerHTML = list.map(i => {
+    const de = exps.filter(e => e.date === i.date).reduce((s,e) => s+e.amount, 0);
+    const p  = i.amount - de;
+    return `<div class="litem">
       <div>
-        <div style="font-size:14px;font-weight:500">${dateStr(i.date)}</div>
-        ${i.customers?`<div class="list-meta">${i.customers} คน · ${fmt(Math.round(i.amount/i.customers))}/คน</div>`:''}
-        ${i.note?`<div class="list-meta">${i.note}</div>`:''}
+        <div class="lname">${dStr(i.date)}</div>
+        <div class="lmeta">${i.customers ? i.customers+' คน · '+fmt(Math.round(i.amount/i.customers))+'/คน' : ''}</div>
+        ${i.note ? `<div class="lmeta">${i.note}</div>` : ''}
       </div>
       <div>
-        <div class="list-amount v-green">${fmt(i.amount)}</div>
-        <div class="list-sub" style="color:${p>=0?'var(--green)':'var(--red)'}">กำไร ${fmt(p)}</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delIncome('${i.date}')">ลบ</button></div>
+        <div class="lamt c-green">${fmt(i.amount)}</div>
+        <div class="lsub" style="color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${fmt(p)}</div>
+        <div style="margin-top:5px;text-align:right"><button class="btn-del" onclick="delIncome('${i.date}')">ลบ</button></div>
       </div>
     </div>`;
   }).join('');
 }
 
 function delIncome(date) {
-  if(!confirm('ลบข้อมูลวันที่ '+date+'?')) return;
-  save('cafe_incomes', load('cafe_incomes').filter(i=>i.date!==date));
-  renderIncomeList(); renderDashboard(); toast('ลบแล้ว');
+  if (!confirm('ลบข้อมูลวันที่ '+date+'?')) return;
+  db.set('cafe_incomes', db.get('cafe_incomes').filter(i => i.date !== date));
+  renderIncomeList(); renderDash(); toast('ลบแล้ว');
 }
 
-// ---- EXPENSE ----
-function saveExpense() {
-  const d = document.getElementById('exp-date').value;
-  const c = document.getElementById('exp-cat').value;
-  const desc = document.getElementById('exp-desc').value.trim();
-  const a = parseFloat(document.getElementById('exp-amt').value);
-  if(!d || isNaN(a) || a<=0) { toast('กรุณากรอกข้อมูลให้ครบ'); return; }
-  const list = load('cafe_expenses');
-  const rec = {id:Date.now(), date:d, cat:c, desc, amount:a};
+// ─── EXPENSE ───
+async function saveExpense() {
+  const date = document.getElementById('eDate').value;
+  const cat  = document.getElementById('eCat').value;
+  const desc = document.getElementById('eDesc').value.trim();
+  const amt  = parseFloat(document.getElementById('eAmt').value);
+  if (!date || isNaN(amt) || amt <= 0) { toast('กรุณากรอกข้อมูลให้ครบ'); return; }
+
+  const list = db.get('cafe_expenses');
+  const rec  = { id: Date.now(), date, cat, desc, amount: amt };
   list.push(rec);
-  list.sort((a,b)=>b.date.localeCompare(a.date));
-  save('cafe_expenses', list);
-  document.getElementById('exp-desc').value='';
-  document.getElementById('exp-amt').value='';
+  list.sort((a,b) => b.date.localeCompare(a.date));
+  db.set('cafe_expenses', list);
+
+  document.getElementById('eDesc').value = '';
+  document.getElementById('eAmt').value  = '';
+
   renderExpenseList();
-  syncToSheets('expense', rec);
-  toast('บันทึกรายจ่ายสำเร็จ');
+
+  const synced = await syncToSheets('expense', rec);
+  toast(synced ? 'บันทึกแล้ว — ส่ง Sheets แล้ว ✓' : 'บันทึกในเครื่องแล้ว (ยังไม่ได้เชื่อม Sheets)');
 }
 
 function renderExpenseList() {
-  const list = load('cafe_expenses').slice(0,15);
-  const el = document.getElementById('expense-list');
-  if(!list.length){ el.innerHTML='<div class="empty">ยังไม่มีข้อมูล</div>'; return; }
-  el.innerHTML = list.map(e=>{
+  const list = db.get('cafe_expenses').slice(0, 15);
+  const el   = document.getElementById('expenseList');
+  if (!list.length) { el.innerHTML = '<div class="empty">ยังไม่มีข้อมูล</div>'; return; }
+  el.innerHTML = list.map(e => {
     const ci = CATS.indexOf(e.cat);
-    return `<div class="list-item">
+    return `<div class="litem">
       <div>
-        <span class="badge ${CAT_BADGE[ci>=0?ci:5]}">${e.cat}</span>
-        <div class="list-meta" style="margin-top:5px">${e.desc||'-'} · ${dateStr(e.date)}</div>
+        <span class="badge ${CAT_CLS[ci>=0?ci:5]}">${e.cat}</span>
+        <div class="lmeta" style="margin-top:4px">${e.desc||'-'} · ${dStr(e.date)}</div>
       </div>
       <div>
-        <div class="list-amount v-red">−${fmt(e.amount)}</div>
-        <div style="margin-top:5px;text-align:right"><button class="btn-danger" onclick="delExpense(${e.id})">ลบ</button></div>
+        <div class="lamt c-red">−${fmt(e.amount)}</div>
+        <div style="margin-top:5px;text-align:right"><button class="btn-del" onclick="delExp(${e.id})">ลบ</button></div>
       </div>
     </div>`;
   }).join('');
 }
 
-function delExpense(id) {
-  if(!confirm('ลบรายการนี้?')) return;
-  save('cafe_expenses', load('cafe_expenses').filter(e=>e.id!==id));
+function delExp(id) {
+  if (!confirm('ลบรายการนี้?')) return;
+  db.set('cafe_expenses', db.get('cafe_expenses').filter(e => e.id !== id));
   renderExpenseList(); toast('ลบแล้ว');
 }
 
-// ---- DASHBOARD ----
-function renderDashboard() {
-  const m = today().slice(0,7);
-  const cfg = getConfig();
-  const inc = load('cafe_incomes').filter(i=>i.date.startsWith(m));
-  const exp = load('cafe_expenses').filter(e=>e.date.startsWith(m));
-  const totalInc = inc.reduce((s,i)=>s+i.amount,0);
-  const totalExp = exp.reduce((s,e)=>s+e.amount,0);
-  const profit = totalInc - totalExp;
-  const margin = totalInc>0 ? Math.round(profit/totalInc*100) : 0;
-  const avg = inc.length>0 ? Math.round(totalInc/inc.length) : 0;
+// ─── DASHBOARD ───
+function renderDash() {
+  const m    = today().slice(0,7);
+  const c    = cfg();
+  const inc  = db.get('cafe_incomes').filter(i => i.date.startsWith(m));
+  const exp  = db.get('cafe_expenses').filter(e => e.date.startsWith(m));
+  const tI   = inc.reduce((s,i) => s+i.amount, 0);
+  const tE   = exp.reduce((s,e) => s+e.amount, 0);
+  const prof = tI - tE;
+  const marg = tI > 0 ? Math.round(prof/tI*100) : 0;
+  const avg  = inc.length > 0 ? Math.round(tI/inc.length) : 0;
   const [y,mo] = m.split('-');
-  const daysInMonth = new Date(+y,+mo,0).getDate();
-  const target = cfg.target * daysInMonth;
-  const pct = Math.min(Math.round(totalInc/target*100)||0, 100);
+  const dim  = new Date(+y,+mo,0).getDate();
+  const tgt  = c.target * dim;
+  const pct  = Math.min(tI > 0 ? Math.round(tI/tgt*100) : 0, 100);
 
   const now = new Date();
-  document.getElementById('dash-date').textContent = DAY_TH[now.getDay()]+' '+now.getDate()+' '+MONTH_TH[now.getMonth()]+' '+(now.getFullYear()+543);
+  document.getElementById('dashDate').textContent = DAY[now.getDay()]+' '+now.getDate()+' '+MON[now.getMonth()]+' '+(now.getFullYear()+543);
 
-  document.getElementById('d-income').textContent = fmt(totalInc);
-  document.getElementById('d-income-sub').textContent = `บันทึก ${inc.length} วัน`;
-  document.getElementById('d-expense').textContent = fmt(totalExp);
-  const dp = document.getElementById('d-profit');
-  dp.textContent = fmt(profit);
-  dp.className = 'metric-value '+(profit>=0?'v-green':'v-red');
-  document.getElementById('d-margin').textContent = `Margin ${margin}%`;
-  document.getElementById('d-avg').textContent = fmt(avg);
-
-  document.getElementById('target-label').textContent = `เป้า ${fmt(target)}`;
-  document.getElementById('target-pct').textContent = pct+'%';
-  const bar = document.getElementById('target-bar');
-  bar.style.width = pct+'%';
+  document.getElementById('dInc').textContent    = fmt(tI);
+  document.getElementById('dIncSub').textContent = `บันทึก ${inc.length} วัน`;
+  document.getElementById('dExp').textContent    = fmt(tE);
+  const dp = document.getElementById('dProfit');
+  dp.textContent = fmt(prof); dp.className = 'mval '+(prof>=0?'c-green':'c-red');
+  document.getElementById('dMargin').textContent = `Margin ${marg}%`;
+  document.getElementById('dAvg').textContent    = fmt(avg);
+  document.getElementById('targetLbl').textContent = `เป้า ${fmt(tgt)}`;
+  document.getElementById('targetPct').textContent = pct+'%';
+  const bar = document.getElementById('targetBar');
+  bar.style.width      = pct+'%';
   bar.style.background = pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
-  document.getElementById('target-note').textContent = `บันทึกแล้ว ${inc.length}/${daysInMonth} วัน · เฉลี่ย ${fmt(avg)}/วัน`;
+  document.getElementById('targetNote').textContent = `บันทึก ${inc.length}/${dim} วัน · เฉลี่ย ${fmt(avg)}/วัน`;
 
-  // Script URL sync status
-  const url = cfg.scriptUrl;
-  const sb = document.getElementById('sync-status');
-  const st = document.getElementById('sync-text');
-  if(url) { sb.className='sync-badge sync-ok'; st.textContent='เชื่อม Sheets แล้ว'; }
-  else { sb.className='sync-badge sync-warn'; st.textContent='ยังไม่เชื่อม Sheets'; }
-
+  updateSyncBadge(!!c.scriptUrl);
   renderWeekChart();
 }
 
 function renderWeekChart() {
-  const inc = load('cafe_incomes');
-  const days = [];
-  for(let i=6;i>=0;i--) {
-    const d = new Date(); d.setDate(d.getDate()-i);
-    const dateKey = d.toISOString().slice(0,10);
-    const found = inc.find(x=>x.date===dateKey);
-    days.push({ label: DAY_TH[d.getDay()], amount: found?found.amount:0, date: dateKey });
-  }
-  const max = Math.max(...days.map(d=>d.amount), 3300);
-  const el = document.getElementById('week-chart');
-  const target = getConfig().target;
-  el.innerHTML = days.map(d=>{
-    const h = Math.round((d.amount/max)*80) || 0;
-    const pct = d.amount/target;
-    const color = d.amount===0?'var(--border)':pct>=1?'var(--green)':pct>=0.7?'var(--amber)':'var(--red)';
-    return `<div class="bar-col">
-      <div class="bar-amt">${d.amount>0?Math.round(d.amount/1000)+'k':''}</div>
-      <div class="bar" style="height:${Math.max(h,d.amount>0?8:4)}px;background:${color}"></div>
-      <div class="bar-label">${d.label}</div>
+  const inc = db.get('cafe_incomes');
+  const tgt = cfg().target;
+  const days = Array.from({length:7}, (_,i) => {
+    const d = new Date(); d.setDate(d.getDate()-(6-i));
+    const k = d.toISOString().slice(0,10);
+    return { label: DAY[d.getDay()], amount: inc.find(x=>x.date===k)?.amount||0 };
+  });
+  const max = Math.max(...days.map(d=>d.amount), tgt, 1);
+  document.getElementById('weekChart').innerHTML = days.map(d => {
+    const h = Math.round((d.amount/max)*72);
+    const c = d.amount===0?'var(--border)':d.amount>=tgt?'var(--green)':d.amount>=tgt*.7?'var(--caramel)':'var(--red)';
+    return `<div class="bcol">
+      <div style="font-size:10px;color:var(--text2)">${d.amount>0?Math.round(d.amount/1000)+'k':''}</div>
+      <div class="bbar" style="height:${Math.max(h,d.amount>0?6:3)}px;background:${c}"></div>
+      <div class="blabel">${d.label}</div>
     </div>`;
   }).join('');
 }
 
-// ---- REPORT ----
+// ─── REPORT ───
 function buildMonthPicker() {
-  const inc = load('cafe_incomes'), exp = load('cafe_expenses');
-  const months = new Set();
-  [...inc,...exp].forEach(i=>months.add(i.date.slice(0,7)));
+  const all = [...db.get('cafe_incomes'), ...db.get('cafe_expenses')];
+  const months = new Set(all.map(i=>i.date.slice(0,7)));
   months.add(today().slice(0,7));
   const sorted = [...months].sort((a,b)=>b.localeCompare(a));
-  const sel = document.getElementById('month-sel');
+  const sel = document.getElementById('monthSel');
   const cur = sel.value;
-  sel.innerHTML = sorted.map(m=>{
+  sel.innerHTML = sorted.map(m => {
     const [y,mo] = m.split('-');
-    const label = MONTH_TH[+mo-1]+' '+(+y+543);
-    return `<option value="${m}" ${m===cur?'selected':''}>${label}</option>`;
+    return `<option value="${m}" ${m===cur?'selected':''}>${MON[+mo-1]} ${+y+543}</option>`;
   }).join('');
-  if(!cur && sorted.length) sel.value = sorted[0];
+  if (!sel.value && sorted.length) sel.value = sorted[0];
 }
 
-function changeMonth(dir) {
-  const sel = document.getElementById('month-sel');
+function shiftMonth(d) {
+  const sel = document.getElementById('monthSel');
   const opts = [...sel.options];
   const ci = opts.findIndex(o=>o.value===sel.value);
-  const ni = ci - dir;
-  if(ni>=0 && ni<opts.length) { sel.value=opts[ni].value; renderReport(); }
+  const ni = ci - d;
+  if (ni>=0 && ni<opts.length) { sel.value=opts[ni].value; renderReport(); }
 }
 
 function renderReport() {
   buildMonthPicker();
-  const m = document.getElementById('month-sel').value;
-  if(!m) return;
-  const cfg = getConfig();
-  const inc = load('cafe_incomes').filter(i=>i.date.startsWith(m));
-  const exp = load('cafe_expenses').filter(e=>e.date.startsWith(m));
-  const totalInc = inc.reduce((s,i)=>s+i.amount,0);
-  const totalExp = exp.reduce((s,e)=>s+e.amount,0);
-  const profit = totalInc - totalExp;
-  const margin = totalInc>0?Math.round(profit/totalInc*100):0;
-  const avg = inc.length>0?Math.round(totalInc/inc.length):0;
+  const m   = document.getElementById('monthSel').value;
+  if (!m) return;
+  const inc = db.get('cafe_incomes').filter(i=>i.date.startsWith(m));
+  const exp = db.get('cafe_expenses').filter(e=>e.date.startsWith(m));
+  const tI  = inc.reduce((s,i)=>s+i.amount,0);
+  const tE  = exp.reduce((s,e)=>s+e.amount,0);
+  const prof= tI-tE;
+  const mar = tI>0?Math.round(prof/tI*100):0;
+  const avg = inc.length>0?Math.round(tI/inc.length):0;
   const [y,mo] = m.split('-');
-  const daysInMonth = new Date(+y,+mo,0).getDate();
-  const target = cfg.target * daysInMonth;
+  const dim = new Date(+y,+mo,0).getDate();
+  const tgt = cfg().target * dim;
 
-  // Alert
-  const alertEl = document.getElementById('report-alert');
-  if(profit>=0) {
-    alertEl.innerHTML = `<div class="alert alert-green">กำไร ${fmt(profit)} · Margin ${margin}% · เฉลี่ย ${fmt(avg)}/วัน</div>`;
-  } else {
-    alertEl.innerHTML = `<div class="alert alert-red">ขาดทุน ${fmt(Math.abs(profit))} · ยอดขายต่ำกว่าเป้า ${fmt(target-totalInc)}</div>`;
-  }
+  document.getElementById('reportAlert').innerHTML = prof>=0
+    ? `<div class="alert al-green">กำไร ${fmt(prof)} · Margin ${mar}% · เฉลี่ย ${fmt(avg)}/วัน</div>`
+    : `<div class="alert al-red">ขาดทุน ${fmt(Math.abs(prof))} · ยอดขายต่ำกว่าเป้า ${fmt(tgt-tI)}</div>`;
 
-  // P&L
   const bycat = {};
-  exp.forEach(e=>{ bycat[e.cat]=(bycat[e.cat]||0)+e.amount; });
-  document.getElementById('pl-table').innerHTML = `
-    <tr class="pl-header"><td>รายการ</td><td></td><td>บาท</td></tr>
-    <tr><td colspan="2">รายได้รวม</td><td style="color:var(--green)">${fmt(totalInc)}</td></tr>
-    <tr><td colspan="3" style="padding-top:10px;font-size:11px;font-weight:600;color:var(--caramel);letter-spacing:.06em">รายจ่าย</td></tr>
-    ${CATS.filter(c=>bycat[c]).map(c=>`<tr><td></td><td style="color:var(--brown)">${c}</td><td style="color:var(--red)">−${fmt(bycat[c])}</td></tr>`).join('')}
-    <tr><td colspan="2">รวมรายจ่าย</td><td style="color:var(--red)">−${fmt(totalExp)}</td></tr>
-    <tr class="pl-total"><td colspan="2">กำไร / ขาดทุน</td><td style="color:${profit>=0?'var(--green)':'var(--red)'}">${fmt(profit)}</td></tr>
+  exp.forEach(e => { bycat[e.cat]=(bycat[e.cat]||0)+e.amount; });
+
+  document.getElementById('plTable').innerHTML = `
+    <tr class="plhead"><td>รายการ</td><td></td><td>บาท</td></tr>
+    <tr><td colspan="2">รายได้รวม</td><td class="c-green">${fmt(tI)}</td></tr>
+    <tr><td colspan="3" style="padding-top:10px;font-size:10px;font-weight:600;color:var(--caramel);letter-spacing:.08em;text-transform:uppercase">รายจ่าย</td></tr>
+    ${CATS.filter(c=>bycat[c]).map(c=>`<tr><td></td><td style="color:var(--text2)">${c}</td><td class="c-red">−${fmt(bycat[c])}</td></tr>`).join('')}
+    <tr><td colspan="2">รวมรายจ่าย</td><td class="c-red">−${fmt(tE)}</td></tr>
+    <tr class="pltotal"><td colspan="2">กำไร / ขาดทุน</td><td style="color:${prof>=0?'var(--green)':'var(--red)'}">${fmt(prof)}</td></tr>
   `;
 
-  // Expense breakdown bars
-  const expEl = document.getElementById('exp-breakdown');
-  if(!exp.length){ expEl.innerHTML='<div class="empty">ไม่มีรายจ่าย</div>'; }
-  else {
-    expEl.innerHTML = CATS.filter(c=>bycat[c]).map(c=>{
-      const pct = Math.round(bycat[c]/totalExp*100);
-      const ci = CATS.indexOf(c);
-      return `<div style="margin-bottom:12px">
-        <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
-          <span><span class="badge ${CAT_BADGE[ci]}" style="margin-right:6px">${c}</span></span>
-          <span style="font-weight:600;color:var(--red)">${fmt(bycat[c])} <span style="font-weight:400;color:var(--brown);opacity:.6">(${pct}%)</span></span>
-        </div>
-        <div class="progress-wrap"><div class="progress-bar" style="width:${pct}%;background:var(--caramel)"></div></div>
-      </div>`;
-    }).join('');
-  }
+  document.getElementById('expBreak').innerHTML = !exp.length
+    ? '<div class="empty">ไม่มีรายจ่าย</div>'
+    : CATS.filter(c=>bycat[c]).map(c => {
+        const pct = Math.round(bycat[c]/tE*100);
+        const ci  = CATS.indexOf(c);
+        return `<div style="margin-bottom:11px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:4px">
+            <span class="badge ${CAT_CLS[ci]}">${c}</span>
+            <span style="font-weight:600;color:var(--red)">${fmt(bycat[c])} <span style="font-weight:400;color:var(--text2)">(${pct}%)</span></span>
+          </div>
+          <div class="prog-wrap"><div class="prog-bar" style="width:${pct}%;background:var(--caramel)"></div></div>
+        </div>`;
+      }).join('');
 
-  // Daily detail
-  const dayExpMap = {};
-  exp.forEach(e=>{ dayExpMap[e.date]=(dayExpMap[e.date]||0)+e.amount; });
-  const detEl = document.getElementById('daily-detail');
-  if(!inc.length){ detEl.innerHTML='<div class="empty">ไม่มีข้อมูล</div>'; return; }
-  detEl.innerHTML = inc.map(i=>{
-    const de = dayExpMap[i.date]||0;
-    const p = i.amount-de;
-    return `<div class="list-item">
-      <div>
-        <div style="font-size:13px;font-weight:500">${dateStr(i.date)}</div>
-        ${i.note?`<div class="list-meta">${i.note}</div>`:''}
-      </div>
-      <div>
-        <div style="text-align:right;font-size:14px;font-weight:600;color:var(--green)">${fmt(i.amount)}</div>
-        <div style="text-align:right;font-size:12px;color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${fmt(p)}</div>
-      </div>
-    </div>`;
-  }).join('');
+  const deMap = {};
+  exp.forEach(e => { deMap[e.date]=(deMap[e.date]||0)+e.amount; });
+  document.getElementById('dailyDetail').innerHTML = !inc.length
+    ? '<div class="empty">ไม่มีข้อมูล</div>'
+    : inc.map(i => {
+        const de = deMap[i.date]||0;
+        const p  = i.amount-de;
+        return `<div class="litem">
+          <div><div class="lname">${dStr(i.date)}</div>${i.note?`<div class="lmeta">${i.note}</div>`:''}</div>
+          <div>
+            <div class="lamt c-green">${fmt(i.amount)}</div>
+            <div class="lsub" style="color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${fmt(p)}</div>
+          </div>
+        </div>`;
+      }).join('');
 }
 
-// ---- CONFIG ----
-function saveConfig() {
-  const cfg = getConfig();
-  cfg.target = parseInt(document.getElementById('cfg-target').value)||3300;
-  cfg.rent = parseInt(document.getElementById('cfg-rent').value)||0;
-  save('cafe_cfg', cfg);
+// ─── CONFIG ───
+function saveCfg() {
+  const c = cfg();
+  c.target = parseInt(document.getElementById('cfgTarget').value)||3300;
+  db.set('cafe_cfg', c);
   toast('บันทึกการตั้งค่าแล้ว');
+  renderDash();
 }
 
-function saveScriptUrl() {
-  const url = document.getElementById('cfg-url').value.trim();
-  const cfg = getConfig();
-  cfg.scriptUrl = url;
-  save('cafe_cfg', cfg);
-  renderDashboard();
-  toast(url ? 'บันทึก URL แล้ว — ทดสอบกรอกข้อมูลดูได้เลย' : 'ล้าง URL แล้ว');
+function saveUrl() {
+  const url = document.getElementById('cfgUrl').value.trim();
+  const c   = cfg();
+  c.scriptUrl = url;
+  db.set('cafe_cfg', c);
+  updateSyncBadge(!!url);
+  toast(url ? 'บันทึก URL แล้ว — กด "ทดสอบ" เพื่อเช็คการเชื่อมต่อ' : 'ล้าง URL แล้ว');
 }
 
-// ---- SYNC TO SHEETS ----
-async function syncToSheets(type, data) {
-  const cfg = getConfig();
-  if(!cfg.scriptUrl) return;
-  try {
-    await fetch(cfg.scriptUrl, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: {'Content-Type': 'application/json'},
-      body: JSON.stringify({type, data})
-    });
-  } catch(e) { console.log('Sync error:', e); }
-}
-
-// ---- EXPORT ----
+// ─── EXPORT ───
 function exportCSV() {
-  const m = document.getElementById('month-sel').value;
-  const inc = load('cafe_incomes').filter(i=>i.date.startsWith(m));
-  const exp = load('cafe_expenses').filter(e=>e.date.startsWith(m));
-  const dayExpMap = {};
-  exp.forEach(e=>{ dayExpMap[e.date]=(dayExpMap[e.date]||0)+e.amount; });
-  let csv = '\ufeff'; // BOM for Thai
-  csv += 'วันที่,ยอดขาย,รายจ่าย,กำไร,ลูกค้า,หมายเหตุ\n';
-  inc.forEach(i=>{
-    const de = dayExpMap[i.date]||0;
-    csv += `${i.date},${i.amount},${de},${i.amount-de},${i.customers||''},${i.note||''}\n`;
-  });
-  const blob = new Blob([csv], {type:'text/csv;charset=utf-8;'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = `barcafe-${m}.csv`; a.click();
-  URL.revokeObjectURL(url);
-  toast('Export CSV สำเร็จ');
+  const m   = document.getElementById('monthSel').value;
+  const inc = db.get('cafe_incomes').filter(i=>i.date.startsWith(m));
+  const exp = db.get('cafe_expenses').filter(e=>e.date.startsWith(m));
+  const dm  = {};
+  exp.forEach(e => { dm[e.date]=(dm[e.date]||0)+e.amount; });
+  let csv = '\ufeff' + 'วันที่,ยอดขาย,รายจ่าย,กำไร,ลูกค้า,หมายเหตุ\n';
+  inc.forEach(i => { csv += `${i.date},${i.amount},${dm[i.date]||0},${i.amount-(dm[i.date]||0)},${i.customers||''},${i.note||''}\n`; });
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})), download: `barcafe-${m}.csv` });
+  a.click(); toast('Export CSV สำเร็จ');
 }
 
-function exportAll() {
-  const data = {
-    incomes: load('cafe_incomes'),
-    expenses: load('cafe_expenses'),
-    config: getConfig(),
-    exportDate: new Date().toISOString()
-  };
-  const blob = new Blob([JSON.stringify(data, null, 2)], {type:'application/json'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'barcafe-backup.json'; a.click();
-  URL.revokeObjectURL(url);
-  toast('Export JSON สำเร็จ');
+function exportJSON() {
+  const data = { incomes: db.get('cafe_incomes'), expenses: db.get('cafe_expenses'), exportDate: new Date().toISOString() };
+  const a = Object.assign(document.createElement('a'), { href: URL.createObjectURL(new Blob([JSON.stringify(data,null,2)],{type:'application/json'})), download:'barcafe-backup.json' });
+  a.click(); toast('Export JSON สำเร็จ');
 }
 
-function clearAll() {
-  if(!confirm('ล้างข้อมูลทั้งหมดในเครื่อง? ข้อมูลใน Sheets จะยังอยู่')) return;
+function clearData() {
+  if (!confirm('ล้างข้อมูลทั้งหมดในเครื่อง?')) return;
   ['cafe_incomes','cafe_expenses'].forEach(k=>localStorage.removeItem(k));
-  renderDashboard(); renderIncomeList(); renderExpenseList();
-  toast('ล้างข้อมูลแล้ว');
+  renderDash(); renderIncomeList(); renderExpenseList(); toast('ล้างข้อมูลแล้ว');
 }
-
-// ---- APPS SCRIPT CODE ----
-const SCRIPT_CODE = `// BAR CAFE — Google Apps Script
-// วางใน Extensions > Apps Script แล้ว Deploy เป็น Web App
-
-function doPost(e) {
-  try {
-    const body = JSON.parse(e.postData.contents);
-    const ss = SpreadsheetApp.getActiveSpreadsheet();
-    const type = body.type;
-    const data = body.data;
-
-    if (type === 'income') {
-      // เขียนลงชีตรายเดือน เช่น Jan26, Feb26
-      const sheetName = getMonthSheet(data.date);
-      let sheet = ss.getSheetByName(sheetName);
-      if (!sheet) {
-        sheet = ss.insertSheet(sheetName);
-        sheet.appendRow(['วันที่','ยอดขาย','จำนวนลูกค้า','ประเภทลูกค้า','หมายเหตุ']);
-        sheet.getRange(1,1,1,5).setFontWeight('bold');
-      }
-      // ตรวจสอบว่ามีวันนั้นแล้วหรือยัง
-      const vals = sheet.getDataRange().getValues();
-      const rowIdx = vals.findIndex(r => r[0] === data.date);
-      const row = [data.date, data.amount, data.customers||0, data.type||'', data.note||''];
-      if (rowIdx > 0) {
-        sheet.getRange(rowIdx+1, 1, 1, 5).setValues([row]);
-      } else {
-        sheet.appendRow(row);
-      }
-    }
-
-    if (type === 'expense') {
-      const sheetName = getMonthSheet(data.date) + '_expense';
-      let sheet = ss.getSheetByName(sheetName);
-      if (!sheet) {
-        sheet = ss.insertSheet(sheetName);
-        sheet.appendRow(['วันที่','หมวด','รายละเอียด','จำนวนเงิน']);
-        sheet.getRange(1,1,1,4).setFontWeight('bold');
-      }
-      sheet.appendRow([data.date, data.cat, data.desc||'', data.amount]);
-    }
-
-    return ContentService
-      .createTextOutput(JSON.stringify({ok: true}))
-      .setMimeType(ContentService.MimeType.JSON);
-
-  } catch(err) {
-    return ContentService
-      .createTextOutput(JSON.stringify({ok: false, error: err.toString()}))
-      .setMimeType(ContentService.MimeType.JSON);
-  }
-}
-
-function getMonthSheet(dateStr) {
-  const d = new Date(dateStr);
-  const months = ['Jan','Feb','Mar','Apr','May','Jun',
-                  'Jul','Aug','Sep','Oct','Nov','Dec'];
-  return months[d.getMonth()] + String(d.getFullYear()).slice(2);
-}`;
 
 function copyScript() {
-  navigator.clipboard.writeText(SCRIPT_CODE).then(()=>toast('คัดลอก Code แล้ว'));
+  navigator.clipboard.writeText(SCRIPT).then(()=>toast('คัดลอก Code แล้ว'));
 }
 
-// ---- INIT ----
-document.getElementById('inc-date').value = today();
-document.getElementById('exp-date').value = today();
-document.getElementById('apps-script-code').textContent = SCRIPT_CODE;
-const cfg = getConfig();
-document.getElementById('cfg-target').value = cfg.target;
-document.getElementById('cfg-rent').value = cfg.rent;
-if(cfg.scriptUrl) document.getElementById('cfg-url').value = cfg.scriptUrl;
+// ─── NAV ───
+function go(name, tab) {
+  document.querySelectorAll('.page').forEach(p=>p.classList.remove('on'));
+  document.querySelectorAll('.ntab').forEach(t=>t.classList.remove('active'));
+  document.getElementById(name).classList.add('on');
+  if (tab) tab.classList.add('active');
+  if (name==='dash')    renderDash();
+  if (name==='report')  { buildMonthPicker(); renderReport(); }
+  if (name==='income')  renderIncomeList();
+  if (name==='expense') renderExpenseList();
+}
+
+// ─── INIT ───
+document.getElementById('iDate').value   = today();
+document.getElementById('eDate').value   = today();
+document.getElementById('scriptDisplay').textContent = SCRIPT;
+const c = cfg();
+document.getElementById('cfgTarget').value = c.target || 3300;
+if (c.scriptUrl) document.getElementById('cfgUrl').value = c.scriptUrl;
+updateSyncBadge(!!c.scriptUrl);
 buildMonthPicker();
-renderDashboard();
+renderDash();
 </script>
-
-
-</body></html>
+</body>
+</html>
