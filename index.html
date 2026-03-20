@@ -315,71 +315,93 @@ const DAY = ['อา','จ','อ','พ','พฤ','ศ','ส'];
 const MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
 // ─── APPS SCRIPT CODE ───
-const SCRIPT = `// BAR CAFE — Apps Script v3
-// Extensions > Apps Script > วาง Code นี้ > Deploy > New deployment
-// Type: Web App | Execute as: Me | Who has access: Anyone
-
-const SHEET_ID = SpreadsheetApp.getActiveSpreadsheet().getId();
+const SCRIPT = `// BAR CAFE — Apps Script v4 (แก้ไขแล้ว ใช้ GET params)
+// 1. เปิด Google Sheets → Extensions → Apps Script
+// 2. ลบ Code เดิมทั้งหมด → วาง Code นี้ → Save (Ctrl+S)
+// 3. Deploy → New deployment → Web App
+//    Execute as: Me | Who has access: Anyone → Deploy → Copy URL
 
 function doGet(e) {
-  return respond(handleData(e.parameter));
-}
+  try {
+    const p    = e.parameter;
+    const type = p.type;
 
-function doPost(e) {
-  let params;
-  try { params = JSON.parse(e.postData.contents); }
-  catch(_) { params = e.parameter; }
-  return respond(handleData(params));
-}
-
-function handleData(p) {
-  if (!p || !p.type) return { ok: true, msg: "Script is live" };
-  const ss = SpreadsheetApp.openById(SHEET_ID);
-  const type = p.type;
-  const d = typeof p.data === 'string' ? JSON.parse(p.data) : p.data;
-
-  if (type === "income") {
-    const name = monthSheet(d.date);
-    let sh = ss.getSheetByName(name);
-    if (!sh) {
-      sh = ss.insertSheet(name);
-      const h = sh.getRange(1,1,1,6);
-      h.setValues([["วันที่","ยอดขาย","จำนวนลูกค้า","ลูกค้า","หมายเหตุ","อัปเดต"]]);
-      h.setFontWeight("bold").setBackground("#1E110A").setFontColor("#B8834A");
+    // ping ทดสอบการเชื่อมต่อ
+    if (!type || type === 'ping') {
+      return ok({ msg: 'Script is live' });
     }
-    const rows = sh.getDataRange().getValues();
-    const idx = rows.findIndex(r => r[0] === d.date);
-    const row = [d.date, +d.amount, +(d.customers||0), d.type||"", d.note||"", new Date().toLocaleString("th-TH")];
-    if (idx > 0) sh.getRange(idx+1,1,1,6).setValues([row]);
-    else sh.appendRow(row);
-  }
 
-  if (type === "expense") {
-    const name = monthSheet(d.date) + "_รายจ่าย";
-    let sh = ss.getSheetByName(name);
-    if (!sh) {
-      sh = ss.insertSheet(name);
-      const h = sh.getRange(1,1,1,5);
-      h.setValues([["วันที่","หมวด","รายละเอียด","จำนวนเงิน","อัปเดต"]]);
-      h.setFontWeight("bold").setBackground("#1E110A").setFontColor("#B8834A");
+    const ss = SpreadsheetApp.getActiveSpreadsheet();
+
+    // ── บันทึกรายได้ ──
+    if (type === 'income') {
+      const sheetName = monthSheet(p.date);
+      let sh = ss.getSheetByName(sheetName);
+      if (!sh) {
+        sh = ss.insertSheet(sheetName);
+        const h = sh.getRange(1, 1, 1, 6);
+        h.setValues([['วันที่', 'ยอดขาย', 'จำนวนลูกค้า', 'ลูกค้า', 'หมายเหตุ', 'อัปเดต']]);
+        h.setFontWeight('bold').setBackground('#1E110A').setFontColor('#B8834A');
+      }
+      const rows = sh.getDataRange().getValues();
+      const idx  = rows.findIndex(r => r[0] === p.date);
+      const row  = [
+        p.date,
+        parseFloat(p.amount) || 0,
+        parseInt(p.customers) || 0,
+        p.ctype || '',
+        p.note  || '',
+        new Date().toLocaleString('th-TH')
+      ];
+      if (idx > 0) {
+        sh.getRange(idx + 1, 1, 1, 6).setValues([row]);
+      } else {
+        sh.appendRow(row);
+      }
+      return ok({ saved: 'income', date: p.date });
     }
-    sh.appendRow([d.date, d.cat, d.desc||"", +d.amount, new Date().toLocaleString("th-TH")]);
-  }
 
-  return { ok: true };
+    // ── บันทึกรายจ่าย ──
+    if (type === 'expense') {
+      const sheetName = monthSheet(p.date) + '_รายจ่าย';
+      let sh = ss.getSheetByName(sheetName);
+      if (!sh) {
+        sh = ss.insertSheet(sheetName);
+        const h = sh.getRange(1, 1, 1, 5);
+        h.setValues([['วันที่', 'หมวด', 'รายละเอียด', 'จำนวนเงิน', 'อัปเดต']]);
+        h.setFontWeight('bold').setBackground('#1E110A').setFontColor('#B8834A');
+      }
+      sh.appendRow([
+        p.date,
+        p.cat   || '',
+        p.desc  || '',
+        parseFloat(p.amount) || 0,
+        new Date().toLocaleString('th-TH')
+      ]);
+      return ok({ saved: 'expense', date: p.date });
+    }
+
+    return ok({ msg: 'unknown type' });
+
+  } catch (err) {
+    return ContentService
+      .createTextOutput(JSON.stringify({ ok: false, error: err.toString() }))
+      .setMimeType(ContentService.MimeType.JSON);
+  }
 }
 
-function respond(data) {
+function ok(data) {
   return ContentService
-    .createTextOutput(JSON.stringify(data))
+    .createTextOutput(JSON.stringify({ ok: true, ...data }))
     .setMimeType(ContentService.MimeType.JSON);
 }
 
 function monthSheet(dateStr) {
   const d = new Date(dateStr);
-  const m = ["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+  const m = ['Jan','Feb','Mar','Apr','May','Jun','Jul','Aug','Sep','Oct','Nov','Dec'];
   return m[d.getMonth()] + String(d.getFullYear()).slice(2);
-}`;
+}
+`;
 
 // ─── STORAGE ───
 const db = {
@@ -404,14 +426,24 @@ async function syncToSheets(type, data) {
   const url = cfg().scriptUrl;
   if (!url) return false;
   try {
-    // ใช้ no-cors mode — ส่งข้อมูลได้แต่ไม่รับ response กลับ (นี่คือวิธีที่ถูกต้องสำหรับ Apps Script)
-    await fetch(url, {
-      method: 'POST',
-      mode: 'no-cors',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, data })
-    });
-    return true;
+    // ส่งผ่าน GET params — ทำงานได้กับ Apps Script ทุก hosting
+    const params = new URLSearchParams({ type });
+    if (type === 'income') {
+      params.set('date',      data.date        || '');
+      params.set('amount',    data.amount      || 0);
+      params.set('customers', data.customers   || 0);
+      params.set('ctype',     data.type        || '');
+      params.set('note',      data.note        || '');
+    }
+    if (type === 'expense') {
+      params.set('date',   data.date   || '');
+      params.set('cat',    data.cat    || '');
+      params.set('desc',   data.desc   || '');
+      params.set('amount', data.amount || 0);
+    }
+    const res = await fetch(url + '?' + params.toString());
+    const json = await res.json();
+    return json.ok === true;
   } catch(e) {
     console.warn('sync error', e);
     return false;
