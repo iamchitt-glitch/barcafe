@@ -591,13 +591,16 @@ async function syncNow(month) {
     })).filter(r => r.date && r.amount > 0);
 
     // parse expense: col 0=date,1=cat,2=desc,3=amount
-    const newExp = eRows.map((r,i) => ({
-      id:     i,
-      date:   r[0].replace(/"/g,''),
-      cat:    (r[1]||'').replace(/"/g,''),
-      desc:   (r[2]||'').replace(/"/g,''),
-      amount: fltCSV(r[3])
-    })).filter(r => r.date && r.amount > 0);
+    const CAT_MAP={'วัตถุดิบ':'Mixed','ค่าแรง':'Wage','ค่าเช่า':'Rent','ค่าไฟน้ำ':'Utility','ซ่อมบำรุง':'Maintenance','อื่นๆ':'Etc'};
+    const newExp = eRows.map((r,i) => {
+      const rawCat=(r[1]||'').replace(/"/g,'').trim();
+      return {
+        id:i, date:r[0].replace(/"/g,'').trim(),
+        cat:CAT_MAP[rawCat]||rawCat,
+        desc:(r[2]||'').replace(/"/g,'').trim(),
+        amount:fltCSV(r[3])
+      };
+    }).filter(r => r.date.match(/\d{4}-\d{2}-\d{2}/) && r.amount > 0);te && r.amount > 0);
 
     // merge into state
     _inc = [..._inc.filter(i => !i.date.startsWith(m)), ...newInc].sort((a,b)=>b.date.localeCompare(a.date));
