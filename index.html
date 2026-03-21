@@ -400,9 +400,11 @@ function doGet(e) {
   if (t === 'income') {
     const sh = getOrCreate(ss, monthName(p.date),
       ['วันที่','ยอดรวม','POS','Delivery','Staff1_แก้ว','Staff2_แก้ว','หมายเหตุ','อัปเดต']);
+    // กำหนด col E,F (staff1,staff2) เป็น Plain Text ก่อนเขียน เพื่อป้องกัน Sheets แปลงเป็น Date
+    sh.getRange(1, 5, sh.getMaxRows(), 2).setNumberFormat('@STRING@');
     const vals = sh.getDataRange().getValues();
     const idx  = vals.findIndex(r => String(r[0]).slice(0,10) === p.date);
-    const row  = [p.date, n(p.amount), n(p.pos), n(p.delivery), n(p.staff1), n(p.staff2), p.note||'', new Date().toLocaleString('th-TH')];
+    const row  = [p.date, n(p.amount), n(p.pos), n(p.delivery), String(n(p.staff1)), String(n(p.staff2)), p.note||'', new Date().toLocaleString('th-TH')];
     idx > 0 ? sh.getRange(idx+1,1,1,8).setValues([row]) : sh.appendRow(row);
     return ok({ saved: 'income' });
   }
