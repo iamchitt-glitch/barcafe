@@ -75,10 +75,10 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
 .cb{background:var(--espresso);color:#A9DFBF;font-family:monospace;font-size:11px;padding:13px;border-radius:9px;overflow-x:auto;white-space:pre;line-height:1.65;margin:8px 0}
 .ss{display:flex;gap:12px;margin-bottom:16px;align-items:flex-start}
 .sn{width:26px;height:26px;border-radius:50%;background:var(--espresso);color:var(--caramel);font-size:12px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0}
-.bc2{display:flex;align-items:flex-end;gap:5px;height:90px;padding-top:4px}
-.bco{flex:1;display:flex;flex-direction:column;align-items:center;gap:4px}
-.bbar{width:100%;border-radius:4px 4px 0 0;min-height:4px;transition:height .4s ease}
-.bbl{font-size:10px;color:var(--t2)}
+
+
+
+
 #ov{position:fixed;inset:0;background:var(--espresso);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:200;transition:opacity .4s}
 #ov.hide{opacity:0;pointer-events:none}
 .ol{font-size:28px;font-weight:600;color:var(--caramel);letter-spacing:.1em;margin-bottom:8px}
@@ -121,18 +121,36 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
     <div class="mc"><div class="ml">กำไร / ขาดทุน</div><div class="mv" id="dP">฿0</div><div class="ms" id="dM">Margin 0%</div></div>
     <div class="mc"><div class="ml">เฉลี่ย/วัน</div><div class="mv ca" id="dA">฿0</div><div class="ms">เป้า ฿3,300</div></div>
   </div>
+  <div class="g2" style="margin-bottom:12px">
+    <div class="mc"><div class="ml">วัตถุดิบ <span style="font-size:10px;color:var(--t2)">(ไม่ควรเกิน 40%)</span></div><div class="mv" id="dMat">฿0</div><div class="ms" id="dMatP">0% ของรายได้</div></div>
+    <div class="mc"><div class="ml">ค่าใช้จ่าย <span style="font-size:10px;color:var(--t2)">(ไม่ควรเกิน 12%)</span></div><div class="mv" id="dOpe">฿0</div><div class="ms" id="dOpeP">0% ของรายได้</div></div>
+  </div>
+  <div class="g2" style="margin-bottom:12px">
+    <div class="mc"><div class="ml">Wage <span style="font-size:10px;color:var(--t2)">(ไม่ควรเกิน 25%)</span></div><div class="mv" id="dWage">฿0</div><div class="ms" id="dWageP">0% ของรายได้</div></div>
+    <div class="mc"><div class="ml">กำไรสุทธิ</div><div class="mv" id="dNet">฿0</div><div class="ms" id="dNetP">Net margin 0%</div></div>
+  </div>
+  <div class="card" id="incentiveCard">
+    <div class="clabel">Incentive พนักงานเดือนนี้ (฿5/แก้ว)</div>
+    <div class="g2" style="margin-bottom:0">
+      <div>
+        <div class="ml">Staff 1</div>
+        <div class="mv ca" id="dS1cups">0 แก้ว</div>
+        <div class="ms cg" id="dS1inc">฿0</div>
+      </div>
+      <div>
+        <div class="ml">Staff 2</div>
+        <div class="mv ca" id="dS2cups">0 แก้ว</div>
+        <div class="ms cg" id="dS2inc">฿0</div>
+      </div>
+    </div>
+  </div>
   <div class="card">
     <div class="clabel">เทียบเป้ารายเดือน</div>
     <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px"><span id="tLbl">เป้า ฿0</span><span id="tPct" style="font-weight:600">0%</span></div>
     <div class="pw"><div class="pb" id="tBar" style="width:0%"></div></div>
     <p id="tNote" style="font-size:11px;color:var(--t2);margin-top:7px"></p>
   </div>
-  <div class="card">
-    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
-      <div class="clabel" style="margin:0">ยอดขาย 7 วันล่าสุด</div>
-    </div>
-    <div class="bc2" id="wchart"></div>
-  </div>
+
   <button class="btn" onclick="go('inc',document.querySelectorAll('.tab')[1])">+ บันทึกยอดขายวันนี้</button>
 </div>
 
@@ -140,13 +158,18 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
 <div id="inc" class="page">
   <div class="card">
     <div class="clabel">บันทึกยอดขาย</div>
+    <div class="field"><label>วันที่</label><input type="date" id="iD"></div>
     <div class="r2">
-      <div class="field"><label>วันที่</label><input type="date" id="iD"></div>
-      <div class="field"><label>จำนวนลูกค้า</label><input type="number" id="iC" placeholder="เช่น 45" min="0" inputmode="numeric"></div>
+      <div class="field"><label>ยอด POS (บาท)</label><input type="number" id="iPos" placeholder="0" min="0" inputmode="decimal" oninput="calcTotal()"></div>
+      <div class="field"><label>ยอด Delivery (บาท)</label><input type="number" id="iDel" placeholder="0" min="0" inputmode="decimal" oninput="calcTotal()"></div>
     </div>
-    <div class="field"><label>ยอดขายรวม (บาท)</label><input type="number" id="iA" placeholder="0" min="0" inputmode="decimal"></div>
-    <div class="field"><label>ลูกค้าส่วนใหญ่</label>
-      <select id="iT"><option value="นักกอล์ฟ">นักกอล์ฟ</option><option value="ทั่วไป">ลูกค้าทั่วไป</option><option value="ผสม">ผสม</option></select>
+    <div class="field"><label>ยอดขายรวม (บาท)</label><input type="number" id="iA" placeholder="คำนวณอัตโนมัติจาก POS + Delivery" min="0" inputmode="decimal" style="font-weight:600;color:var(--green)"></div>
+    <div style="border-top:.5px solid var(--border);margin:4px 0 14px;padding-top:14px">
+      <div style="font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--caramel);margin-bottom:10px">จำนวนแก้ว Staff (Incentive ฿5/แก้ว)</div>
+      <div class="r2">
+        <div class="field"><label>Staff 1 (แก้ว)</label><input type="number" id="iS1" placeholder="0" min="0" inputmode="numeric"><div class="hint">Incentive = แก้ว × ฿5</div></div>
+        <div class="field"><label>Staff 2 (แก้ว)</label><input type="number" id="iS2" placeholder="0" min="0" inputmode="numeric"><div class="hint">Incentive = แก้ว × ฿5</div></div>
+      </div>
     </div>
     <div class="field"><label>หมายเหตุ</label><textarea id="iN" placeholder="เช่น วันหยุด / ฝนตก / มีทัวร์นาเมนต์..."></textarea></div>
     <button class="btn" onclick="saveInc()">บันทึกยอดขาย</button>
@@ -162,7 +185,24 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
     <div class="r2">
       <div class="field"><label>วันที่</label><input type="date" id="eD"></div>
       <div class="field"><label>หมวดหมู่</label>
-        <select id="eC"><option value="วัตถุดิบ">วัตถุดิบ</option><option value="ค่าแรง">ค่าแรงพนักงาน</option><option value="ค่าเช่า">ค่าเช่า/สนาม</option><option value="ค่าไฟน้ำ">ค่าไฟ/น้ำ</option><option value="ซ่อมบำรุง">ซ่อมบำรุง</option><option value="อื่นๆ">อื่นๆ</option></select>
+        <select id="eC">
+          <optgroup label="วัตถุดิบ">
+            <option value="Mixed">Mixed</option>
+            <option value="Appetizer">Appetizer</option>
+            <option value="Beverages">Beverages</option>
+            <option value="Fruits">Fruits</option>
+            <option value="Bakery">Bakery</option>
+            <option value="Snack">Snack</option>
+          </optgroup>
+          <optgroup label="ค่าใช้จ่าย">
+            <option value="Rent">Rent</option>
+            <option value="Utility">Utility</option>
+            <option value="Maintenance">Maintenance</option>
+            <option value="Wage">Wage</option>
+            <option value="MKT">MKT</option>
+            <option value="Etc">Etc</option>
+          </optgroup>
+        </select>
       </div>
     </div>
     <div class="field"><label>รายละเอียด</label><input type="text" id="eDesc" placeholder="เช่น เมล็ดกาแฟ 1kg / ค่าแรงรายวัน"></div>
@@ -229,8 +269,11 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
 <div id="toast"></div>
 
 <script>
-const CATS=['วัตถุดิบ','ค่าแรง','ค่าเช่า','ค่าไฟน้ำ','ซ่อมบำรุง','อื่นๆ'];
-const CC=['bg','bb','ba','br','bc','bb'];
+const CATS=['Mixed','Appetizer','Beverages','Fruits','Bakery','Snack','Rent','Utility','Maintenance','Wage','MKT','Etc'];
+const CATS_MAT=['Mixed','Appetizer','Beverages','Fruits','Bakery','Snack'];
+const CATS_EXP=['Rent','Utility','Maintenance','MKT','Etc'];
+const CATS_WAGE=['Wage'];
+const CC=['bg','bg','bg','bg','bg','bg','bb','bb','bb','br','ba','bb'];
 const DAY=['อา','จ','อ','พ','พฤ','ศ','ส'];
 const MON=['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
@@ -312,9 +355,11 @@ async function syncNow(month){
     const newInc=iRows.map(r=>({
       date:r[0].replace(/"/g,''),
       amount:parseFloat((r[1]||'').replace(/"/g,'').replace(/,/g,''))||0,
-      customers:parseInt((r[2]||'').replace(/"/g,'').replace(/,/g,''))||0,
-      type:(r[3]||'').replace(/"/g,''),
-      note:(r[4]||'').replace(/"/g,'')
+      pos:parseFloat((r[2]||'').replace(/"/g,'').replace(/,/g,''))||0,
+      delivery:parseFloat((r[3]||'').replace(/"/g,'').replace(/,/g,''))||0,
+      staff1:parseFloat((r[4]||'').replace(/"/g,'').replace(/,/g,''))||0,
+      staff2:parseFloat((r[5]||'').replace(/"/g,'').replace(/,/g,''))||0,
+      note:(r[6]||'').replace(/"/g,'')
     })).filter(r=>r.amount>0);
 
     // parse expense rows: [date, cat, desc, amount, ...]
@@ -439,7 +484,9 @@ function renderIList(){
   const dm={};exp.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.amount;});
   el.innerHTML=inc.slice(0,10).map(i=>{
     const p=i.amount-(dm[i.date]||0);
-    return`<div class="li"><div><div class="ln">${ds(i.date)}</div>${i.customers?`<div class="lm">${i.customers} คน · ${fmt(Math.round(i.amount/i.customers))}/คน</div>`:''} ${i.note?`<div class="lm">${i.note}</div>`:''}</div><div><div class="la cg">${fmt(i.amount)}</div><div class="ls" style="color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${fmt(p)}</div></div></div>`;
+    const posStr=i.pos||i.delivery?`POS ${fmt(i.pos||0)} · Delivery ${fmt(i.delivery||0)}`:'';
+    const s12=i.staff1||i.staff2?`Staff: ${i.staff1||0} แก้ว (฿${(i.staff1||0)*5}) / ${i.staff2||0} แก้ว (฿${(i.staff2||0)*5})`:'';;
+    return`<div class="li"><div><div class="ln">${ds(i.date)}</div>${posStr?`<div class="lm">${posStr}</div>`:''} ${s12?`<div class="lm">${s12}</div>`:''} ${i.note?`<div class="lm">${i.note}</div>`:''}</div><div><div class="la cg">${fmt(i.amount)}</div><div class="ls" style="color:${p>=0?'var(--green)':'var(--red)'}">${p>=0?'+':''}${fmt(p)}</div></div></div>`;
   }).join('');
 }
 
@@ -481,23 +528,35 @@ function renderDash(){
   const bar=document.getElementById('tBar');bar.style.width=pct+'%';
   bar.style.background=pct>=80?'var(--green)':pct>=50?'var(--amber)':'var(--red)';
   document.getElementById('tNote').textContent=`บันทึก ${inc.length}/${dim} วัน · เฉลี่ย ${fmt(avg)}/วัน`;
-  renderWChart();
+  // cost metrics
+  const matCats=CATS_MAT;
+  const tMat=exp.filter(e=>matCats.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
+  const tWage=exp.filter(e=>e.cat==='Wage').reduce((s,e)=>s+e.amount,0);
+  const tOpe=exp.filter(e=>CATS_EXP.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
+  const tNet=tI-tE;
+  const pMat=tI>0?Math.round(tMat/tI*100):0;
+  const pWage=tI>0?Math.round(tWage/tI*100):0;
+  const pOpe=tI>0?Math.round(tOpe/tI*100):0;
+  const pNet=tI>0?Math.round(tNet/tI*100):0;
+  const matEl=document.getElementById('dMat');matEl.textContent=fmt(tMat);matEl.className='mv '+(pMat>40?'cr':pMat>32?'ca':'cg');
+  document.getElementById('dMatP').textContent=pMat+'% ของรายได้';
+  const opeEl=document.getElementById('dOpe');opeEl.textContent=fmt(tOpe);opeEl.className='mv '+(pOpe>12?'cr':pOpe>10?'ca':'cg');
+  document.getElementById('dOpeP').textContent=pOpe+'% ของรายได้';
+  const wageEl=document.getElementById('dWage');wageEl.textContent=fmt(tWage);wageEl.className='mv '+(pWage>25?'cr':pWage>20?'ca':'cg');
+  document.getElementById('dWageP').textContent=pWage+'% ของรายได้';
+  const netEl=document.getElementById('dNet');netEl.textContent=fmt(tNet);netEl.className='mv '+(tNet>=0?'cg':'cr');
+  document.getElementById('dNetP').textContent='Net margin '+pNet+'%';
+  // incentive
+  const s1cups=inc.reduce((s,i)=>s+(i.staff1||0),0);
+  const s2cups=inc.reduce((s,i)=>s+(i.staff2||0),0);
+  document.getElementById('dS1cups').textContent=s1cups+' แก้ว';
+  document.getElementById('dS2cups').textContent=s2cups+' แก้ว';
+  document.getElementById('dS1inc').textContent=fmt(s1cups*5);
+  document.getElementById('dS2inc').textContent=fmt(s2cups*5);
+  document.getElementById('incentiveCard').style.display=(s1cups||s2cups)?'block':'none';
 }
 
-function renderWChart(){
-  const tgt=cfg().target;
-  const days=Array.from({length:7},(_,i)=>{
-    const d=new Date();d.setDate(d.getDate()-(6-i));
-    const k=d.toISOString().slice(0,10);
-    return{label:DAY[d.getDay()],amount:_inc.find(x=>x.date===k)?.amount||0};
-  });
-  const max=Math.max(...days.map(d=>d.amount),tgt,1);
-  document.getElementById('wchart').innerHTML=days.map(d=>{
-    const h=Math.round((d.amount/max)*72);
-    const c=d.amount===0?'var(--border)':d.amount>=tgt?'var(--green)':d.amount>=tgt*.7?'var(--caramel)':'var(--red)';
-    return`<div class="bco"><div style="font-size:10px;color:var(--t2)">${d.amount>0?Math.round(d.amount/1000)+'k':''}</div><div class="bbar" style="height:${Math.max(h,d.amount>0?6:3)}px;background:${c}"></div><div class="bbl">${d.label}</div></div>`;
-  }).join('');
-}
+
 
 // ── REPORT ──
 async function buildMPicker(){
@@ -565,8 +624,8 @@ function exportCSV(){
   const m=document.getElementById('msel').value;
   const{inc,exp}=getM(m);
   const dm={};exp.forEach(e=>{dm[e.date]=(dm[e.date]||0)+e.amount;});
-  let csv='\ufeff'+'วันที่,ยอดขาย,รายจ่าย,กำไร,ลูกค้า,หมายเหตุ\n';
-  inc.forEach(i=>{csv+=`${i.date},${i.amount},${dm[i.date]||0},${i.amount-(dm[i.date]||0)},${i.customers||''},${i.note||''}\n`;});
+  let csv='\ufeff'+'วันที่,ยอดรวม,POS,Delivery,พนักงาน1,พนักงาน2,รายจ่าย,กำไร,หมายเหตุ\n';
+  inc.forEach(i=>{csv+=`${i.date},${i.amount},${i.pos||0},${i.delivery||0},${i.staff1||0},${i.staff2||0},${dm[i.date]||0},${i.amount-(dm[i.date]||0)},${i.note||''}\n`;});
   const a=Object.assign(document.createElement('a'),{href:URL.createObjectURL(new Blob([csv],{type:'text/csv;charset=utf-8;'})),download:`barcafe-${m}.csv`});
   a.click();toast('Export CSV สำเร็จ');
 }
