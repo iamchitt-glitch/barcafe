@@ -433,28 +433,17 @@ async function fetchCSV(shName){
 }
 
 async function syncNow(month){
-  const sid=cfg().sid;
-  if(!sid){ setSP('s-off','ใส่ Sheet ID ก่อน'); return false; }
+  const url=cfg().url;
+  if(!url){ setSP('s-off','ใส่ Apps Script URL ก่อน'); return false; }
   setSP('s-ld','กำลัง Sync...');
   const m=month||tod().slice(0,7);
-  const sn=sheetMonth(m);
   try{
-    const [iRows,eRows]=await Promise.all([fetchCSV(sn),fetchCSV(sn+'_รายจ่าย')]);
-    const newInc=iRows.map(r=>({
-      date:  r[0].replace(/"/g,'').trim(),
-      amount:fltCSV(r[1]), pos:fltCSV(r[2]), delivery:fltCSV(r[3]),
-      staff1:intCSV(r[4]), staff2:intCSV(r[5]),
-      note:  (r[6]||'').replace(/"/g,'').trim()
-    })).filter(r=>r.date.match(/\d{4}-\d{2}-\d{2}/)&&r.amount>0);
-    const newExp=eRows.map((r,i)=>{
-      const rawCat=(r[1]||'').replace(/"/g,'').trim();
-      return{
-        id:i, date:r[0].replace(/"/g,'').trim(),
-        cat:CAT_MAP[rawCat]||rawCat,
-        desc:(r[2]||'').replace(/"/g,'').trim(),
-        amount:fltCSV(r[3])
-      };
-    }).filter(r=>r.date.match(/\d{4}-\d{2}-\d{2}/)&&r.amount>0);
+    const [ri,re]=await Promise.all([
+      fetch(url+'?type=get_income&month='+m).then(r=>r.json()),
+      fetch(url+'?type=get_expense&month='+m).then(r=>r.json())
+    ]);
+    const newInc=(ri.ok&&ri.rows)?ri.rows:[];
+    const newExp=(re.ok&&re.rows)?re.rows:[];
 
     _inc=[..._inc.filter(i=>!i.date.startsWith(m)),...newInc].sort((a,b)=>b.date.localeCompare(a.date));
     _exp=[..._exp.filter(e=>!e.date.startsWith(m)),...newExp].sort((a,b)=>b.date.localeCompare(a.date));
@@ -470,7 +459,7 @@ async function syncNow(month){
   }catch(err){
     console.error('syncNow error:',err);
     setSP('s-off','Sync ไม่สำเร็จ');
-    document.getElementById('cfgMsg').innerHTML=`<div class="alert aa">Sync ไม่สำเร็จ — เช็ค Sheet ID และการตั้งค่า Public</div>`;
+    document.getElementById('cfgMsg').innerHTML=`<div class="alert aa">Sync ไม่สำเร็จ — เช็ค Apps Script URL</div>`;
     return false;
   }
 }
@@ -711,11 +700,11 @@ async function init(){
   const ov=document.getElementById('ov');
   const dismiss=()=>{ov.classList.add('hide');setTimeout(()=>ov.style.display='none',500);};
   renderDash();
-  if(C.sid){
+  if(C.url){
     document.getElementById('omsg').textContent='กำลังดึงข้อมูลจาก Sheets...';
     await Promise.race([syncNow(), new Promise(r=>setTimeout(r,8000))]);
   } else {
-    document.getElementById('omsg').textContent='ไปหน้าตั้งค่า ใส่ Sheet ID';
+    document.getElementById('omsg').textContent='ไปหน้าตั้งค่า ใส่ Apps Script URL';
     await new Promise(r=>setTimeout(r,1000));
   }
   dismiss();
