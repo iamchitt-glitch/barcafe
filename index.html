@@ -488,8 +488,11 @@ async function push(type,data){
 function getM(m){
   const inc=_inc.filter(i=>i.date.startsWith(m));
   const exp=_exp.filter(e=>e.date.startsWith(m));
-  if(inc.length||exp.length) return{inc,exp};
-  return{inc:db.get('inc_'+m,[]),exp:db.get('exp_'+m,[])};
+  // fallback แยกกัน: ถ้า _inc หรือ _exp ของเดือนนั้นว่าง ให้ใช้ cache
+  return{
+    inc: inc.length ? inc : db.get('inc_'+m,[]),
+    exp: exp.length ? exp : db.get('exp_'+m,[])
+  };
 }
 
 function calcTotal(){
@@ -547,8 +550,14 @@ async function saveExp(){
   renderEList();
   toast('กำลังบันทึก...');
   const ok=await push('expense',rec);
-  if(ok){toast('บันทึกแล้ว ✓ กำลัง Sync...');setTimeout(()=>syncNow(date.slice(0,7)),1500);}
-  else toast('บันทึกในเครื่องแล้ว (ยังไม่ได้เชื่อม Apps Script)');
+  if(ok){
+    toast('บันทึกแล้ว ✓');
+    // sync 2 ครั้ง: เร็ว (3วิ) และช้า (8วิ) กันกรณี Sheets ยังไม่ update ทัน
+    setTimeout(()=>syncNow(date.slice(0,7)), 3000);
+    setTimeout(()=>syncNow(date.slice(0,7)), 8000);
+  } else {
+    toast('บันทึกในเครื่องแล้ว (ยังไม่ได้เชื่อม Apps Script)');
+  }
 }
 
 function renderEList(){
