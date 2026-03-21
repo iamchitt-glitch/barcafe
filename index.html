@@ -129,7 +129,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
     <div class="mc"><div class="ml">Wage <span style="font-size:10px;color:var(--t2)">(ไม่ควรเกิน 25%)</span></div><div class="mv" id="dWage">฿0</div><div class="ms" id="dWageP">0% ของรายได้</div></div>
     <div class="mc"><div class="ml">กำไรสุทธิ</div><div class="mv" id="dNet">฿0</div><div class="ms" id="dNetP">Net margin 0%</div></div>
   </div>
-  <div class="card" id="incentiveCard">
+  <div class="card" id="incentiveCard" style="display:none">
     <div class="clabel">Incentive พนักงานเดือนนี้ (฿5/แก้ว)</div>
     <div class="g2" style="margin-bottom:0">
       <div>
@@ -357,8 +357,8 @@ async function syncNow(month){
       amount:parseFloat((r[1]||'').replace(/"/g,'').replace(/,/g,''))||0,
       pos:parseFloat((r[2]||'').replace(/"/g,'').replace(/,/g,''))||0,
       delivery:parseFloat((r[3]||'').replace(/"/g,'').replace(/,/g,''))||0,
-      staff1:parseFloat((r[4]||'').replace(/"/g,'').replace(/,/g,''))||0,
-      staff2:parseFloat((r[5]||'').replace(/"/g,'').replace(/,/g,''))||0,
+      staff1:parseInt((r[4]||'').replace(/"/g,'').replace(/,/g,''))||0,
+      staff2:parseInt((r[5]||'').replace(/"/g,'').replace(/,/g,''))||0,
       note:(r[6]||'').replace(/"/g,'')
     })).filter(r=>r.amount>0);
 
@@ -406,7 +406,7 @@ async function push(type,data){
   if(!url) return false;
   try{
     const p=new URLSearchParams({type});
-    if(type==='income'){p.set('date',data.date);p.set('amount',data.amount);p.set('customers',data.customers||0);p.set('ctype',data.type||'');p.set('note',data.note||'');}
+    if(type==='income'){p.set('date',data.date);p.set('amount',data.amount);p.set('pos',data.pos||0);p.set('delivery',data.delivery||0);p.set('staff1',data.staff1||0);p.set('staff2',data.staff2||0);p.set('note',data.note||'');}
     if(type==='expense'){p.set('date',data.date);p.set('cat',data.cat);p.set('desc',data.desc||'');p.set('amount',data.amount);}
     const r=await fetch(url+'?'+p.toString());
     const j=await r.json();
@@ -425,22 +425,32 @@ function getM(m){
 }
 
 // ── SAVE INCOME ──
+function calcTotal(){
+  const pos=parseFloat(document.getElementById('iPos').value)||0;
+  const del=parseFloat(document.getElementById('iDel').value)||0;
+  document.getElementById('iA').value=(pos+del)||'';
+}
+
 async function saveInc(){
   const date=document.getElementById('iD').value;
-  const amt=parseFloat(document.getElementById('iA').value);
-  const cust=parseInt(document.getElementById('iC').value)||0;
-  const type=document.getElementById('iT').value;
+  const pos=parseFloat(document.getElementById('iPos').value)||0;
+  const del=parseFloat(document.getElementById('iDel').value)||0;
+  const amt=parseFloat(document.getElementById('iA').value)||(pos+del)||0;
+  const s1=parseInt(document.getElementById('iS1').value)||0;
+  const s2=parseInt(document.getElementById('iS2').value)||0;
   const note=document.getElementById('iN').value.trim();
-  if(!date||isNaN(amt)||amt<=0){toast('กรุณากรอกวันที่และยอดขาย');return;}
-  const rec={date,amount:amt,customers:cust,type,note};
+  if(!date||amt<=0){toast('กรุณากรอกวันที่และยอดขาย');return;}
+  const rec={date,amount:amt,pos,delivery:del,staff1:s1,staff2:s2,note};
 
-  // optimistic update
   const idx=_inc.findIndex(i=>i.date===date);
   if(idx>=0){if(!confirm('มีข้อมูลวันนี้แล้ว แทนที่?'))return;_inc[idx]=rec;}
   else{_inc.unshift(rec);_inc.sort((a,b)=>b.date.localeCompare(a.date));}
 
+  document.getElementById('iPos').value='';
+  document.getElementById('iDel').value='';
   document.getElementById('iA').value='';
-  document.getElementById('iC').value='';
+  document.getElementById('iS1').value='';
+  document.getElementById('iS2').value='';
   document.getElementById('iN').value='';
   renderIList();renderDash();
   toast('กำลังบันทึก...');
@@ -448,7 +458,7 @@ async function saveInc(){
   const ok=await push('income',rec);
   if(ok){
     toast('บันทึกแล้ว ✓ กำลัง Sync...');
-    setTimeout(()=>syncNow(date.slice(0,7)),1500); // รอให้ Sheets อัปเดตก่อน
+    setTimeout(()=>syncNow(date.slice(0,7)),1500);
   } else {
     toast('บันทึกแล้ว (ยังไม่ได้เชื่อม Apps Script)');
   }
@@ -547,8 +557,8 @@ function renderDash(){
   const netEl=document.getElementById('dNet');netEl.textContent=fmt(tNet);netEl.className='mv '+(tNet>=0?'cg':'cr');
   document.getElementById('dNetP').textContent='Net margin '+pNet+'%';
   // incentive
-  const s1cups=inc.reduce((s,i)=>s+(i.staff1||0),0);
-  const s2cups=inc.reduce((s,i)=>s+(i.staff2||0),0);
+  const s1cups=inc.reduce((s,i)=>s+(parseInt(i.staff1)||0),0);
+  const s2cups=inc.reduce((s,i)=>s+(parseInt(i.staff2)||0),0);
   document.getElementById('dS1cups').textContent=s1cups+' แก้ว';
   document.getElementById('dS2cups').textContent=s2cups+' แก้ว';
   document.getElementById('dS1inc').textContent=fmt(s1cups*5);
