@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<title>BAR CAFE — เช็คสต็อก</title>
+<link href="https://fonts.googleapis.com/css2?family=Sarabun:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#0f1117;--bg2:#181b24;--bg3:#1e2230;--surface:#252a38;--surface2:#2d3347;
+  --border:#2e3450;--border2:#3a4060;
+  --text:#e8eaf2;--text2:#8b90a8;--text3:#5a6080;
+  --accent:#f0a500;--accent2:#ffd166;
+  --green:#2dd4a0;--green-bg:rgba(45,212,160,.1);
+  --red:#ff6b6b;--red-bg:rgba(255,107,107,.1);
+  --yellow:#ffd166;--yellow-bg:rgba(255,209,102,.12);
+  --blue:#5b8dee;--purple:#a78bfa;
+  --font:'Sarabun',sans-serif;--mono:'IBM Plex Mono',monospace;
+  --r:12px;--rs:8px;
+}
+*{margin:0;padding:0;box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{font-family:var(--font);background:var(--bg);color:var(--text);min-height:100vh;font-size:15px;padding-bottom:80px}
+.topbar{background:var(--bg2);border-bottom:1px solid var(--border);padding:0 16px;display:flex;align-items:center;justify-content:space-between;height:56px;position:sticky;top:0;z-index:50;gap:8px}
+.tb-logo{font-size:16px;font-weight:700;letter-spacing:2px;color:var(--accent);flex-shrink:0}
+.tb-sync{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text3);cursor:pointer;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:5px 10px;transition:all .15s;font-family:var(--font)}
+.tb-sync:hover{border-color:var(--accent);color:var(--accent)}
+.tb-sync.syncing{color:var(--yellow);border-color:rgba(255,209,102,.3);animation:pulse .8s infinite}
+.tb-sync.ok{color:var(--green);border-color:rgba(45,212,160,.3)}
+.tb-sync.err{color:var(--red);border-color:rgba(255,107,107,.3)}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.45}}
+.tb-role{font-size:11px;background:var(--surface);border:1px solid var(--border);padding:3px 10px;border-radius:99px;color:var(--text3);flex-shrink:0}
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:var(--bg2);border-top:1px solid var(--border);display:flex;z-index:50;height:64px}
+.bnav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;cursor:pointer;border:none;background:none;font-family:var(--font);color:var(--text3);font-size:11px;transition:color .15s;padding:8px 4px}
+.bnav-item.active{color:var(--accent)}
+.bnav-icon{font-size:20px;line-height:1}
+.page{display:none;padding:16px}
+.page.active{display:block}
+.page-title{font-size:18px;font-weight:700;margin-bottom:4px}
+.page-sub{font-size:12px;color:var(--text3);margin-bottom:16px}
+.stats-row{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-bottom:16px}
+.stat-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:12px 14px;text-align:center}
+.stat-val{font-size:26px;font-weight:700;font-family:var(--mono);line-height:1.1}
+.stat-lbl{font-size:11px;color:var(--text3);margin-top:4px}
+.stat-card.warn{border-color:rgba(255,209,102,.3);background:rgba(255,209,102,.04)}
+.stat-card.danger{border-color:rgba(255,107,107,.3);background:rgba(255,107,107,.04)}
+.alert-strip{background:rgba(255,107,107,.07);border:1px solid rgba(255,107,107,.25);border-radius:var(--rs);padding:10px 14px;margin-bottom:10px;font-size:13px;display:flex;gap:8px;align-items:flex-start}
+.alert-strip.warn{background:rgba(255,209,102,.06);border-color:rgba(255,209,102,.25)}
+.adot{width:7px;height:7px;border-radius:50%;background:var(--red);flex-shrink:0;margin-top:4px;animation:blink .9s infinite}
+.adot.warn{background:var(--yellow);animation:none}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.2}}
+.search-box{width:100%;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);padding:11px 14px;color:var(--text);font-family:var(--font);font-size:15px;outline:none;margin-bottom:10px}
+.search-box:focus{border-color:var(--accent)}
+.search-box::placeholder{color:var(--text3)}
+.filter-scroll{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;margin-bottom:12px;scrollbar-width:none}
+.filter-scroll::-webkit-scrollbar{display:none}
+.filter-chip{padding:7px 14px;border-radius:99px;border:1px solid var(--border);background:var(--surface);color:var(--text2);cursor:pointer;font-family:var(--font);font-size:13px;white-space:nowrap;transition:all .15s}
+.filter-chip.active{background:rgba(240,165,0,.12);border-color:rgba(240,165,0,.4);color:var(--accent)}
+.filter-chip.danger{color:var(--red);border-color:rgba(255,107,107,.3)}
+.filter-chip.danger.active{background:var(--red-bg);border-color:rgba(255,107,107,.5)}
+.stock-list{display:flex;flex-direction:column;gap:8px}
+.stock-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:center;gap:12px}
+.stock-card.s-low{border-color:rgba(255,209,102,.3)}
+.stock-card.s-out{border-color:rgba(255,107,107,.35)}
+.sc-left{flex:1;min-width:0}
+.sc-name{font-weight:600;font-size:15px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sc-meta{font-size:12px;margin-top:3px;display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.sc-badge{display:inline-flex;align-items:center;padding:2px 8px;border-radius:99px;font-size:11px;font-weight:600}
+.prog-bar{height:4px;background:var(--border);border-radius:99px;overflow:hidden;margin-top:6px}
+.prog-fill{height:100%;border-radius:99px;transition:width .4s}
+.pf-ok{background:var(--green)}.pf-low{background:var(--yellow)}.pf-out{background:var(--red)}
+.sc-right{display:flex;flex-direction:column;align-items:flex-end;gap:8px;flex-shrink:0}
+.sc-num{font-family:var(--mono);font-size:22px;font-weight:700;line-height:1}
+.sc-unit{font-size:11px;color:var(--text3);margin-top:1px;text-align:right}
+.adj-btns{display:flex;gap:6px}
+.adj-btn{width:38px;height:38px;border-radius:var(--rs);border:1px solid var(--border);background:var(--surface);color:var(--text2);font-size:20px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.adj-btn.plus{border-color:rgba(45,212,160,.35);color:var(--green)}
+.adj-btn.plus:active{background:rgba(45,212,160,.15)}
+.adj-btn.minus{border-color:rgba(255,107,107,.3);color:var(--red)}
+.adj-btn.minus:active{background:rgba(255,107,107,.12)}
+.adj-btn:disabled{opacity:.3;cursor:not-allowed}
+.src-makro{background:rgba(0,180,120,.12);color:#00c984}
+.src-market{background:rgba(255,160,50,.12);color:#ffaa2e}
+.src-shop{background:rgba(160,100,255,.12);color:#b07aff}
+.src-online{background:rgba(91,141,238,.12);color:var(--blue)}
+.src-etc{background:rgba(140,145,168,.12);color:var(--text2)}
+.cat-drink{background:rgba(45,212,160,.1);color:var(--green)}
+.cat-syrup{background:rgba(255,209,102,.12);color:var(--yellow)}
+.cat-snack{background:rgba(91,141,238,.1);color:var(--blue)}
+.cat-cake{background:rgba(167,139,250,.1);color:var(--purple)}
+.cat-bev{background:rgba(255,107,107,.1);color:var(--red)}
+.cat-pack{background:rgba(240,165,0,.12);color:var(--accent)}
+.cat-ing{background:rgba(100,180,255,.1);color:#64b4ff}
+.recv-form{background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);padding:18px}
+.fg{margin-bottom:14px}
+.fl{display:block;font-size:13px;color:var(--text2);margin-bottom:6px;font-weight:500}
+.fi{width:100%;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:12px 14px;color:var(--text);font-family:var(--font);font-size:15px;outline:none;transition:border-color .15s;-webkit-appearance:none}
+.fi:focus{border-color:var(--accent)}
+select.fi option{background:var(--bg3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.btn{display:flex;align-items:center;justify-content:center;gap:7px;padding:14px;border-radius:var(--rs);border:none;cursor:pointer;font-family:var(--font);font-size:15px;font-weight:600;transition:all .15s;width:100%}
+.btn-primary{background:var(--accent);color:#0f1117}
+.btn-primary:active{background:var(--accent2)}
+.btn-primary:disabled{opacity:.5;cursor:not-allowed}
+.log-list{display:flex;flex-direction:column;gap:8px}
+.log-card{background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs);padding:12px 16px;display:flex;justify-content:space-between;align-items:center;gap:12px}
+.log-name{font-weight:600;font-size:14px}
+.log-meta{font-size:11px;color:var(--text3);margin-top:2px}
+.log-qty{font-family:var(--mono);font-size:18px;font-weight:700;color:var(--green)}
+.log-date{font-size:11px;color:var(--text3);margin-top:2px;text-align:right}
+.src-section{margin-bottom:16px}
+.src-header{display:flex;align-items:center;gap:10px;padding:12px 16px;background:var(--bg2);border:1px solid var(--border);border-radius:var(--rs) var(--rs) 0 0;border-bottom:none}
+.src-icon{font-size:20px}
+.src-name-lbl{font-weight:700;font-size:15px}
+.src-items{background:var(--bg3);border:1px solid var(--border);border-radius:0 0 var(--rs) var(--rs)}
+.src-row{display:flex;justify-content:space-between;align-items:center;padding:10px 16px;border-bottom:1px solid var(--border);font-size:14px}
+.src-row:last-child{border-bottom:none}
+.src-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;display:inline-block;margin-right:5px}
+/* SETUP */
+.setup-wrap{display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:calc(100vh - 60px);padding:28px;text-align:center}
+.setup-icon{font-size:52px;margin-bottom:18px}
+.setup-title{font-size:20px;font-weight:700;margin-bottom:8px}
+.setup-desc{font-size:14px;color:var(--text2);line-height:1.75;margin-bottom:24px;max-width:320px}
+.setup-input{width:100%;max-width:360px;background:var(--surface);border:1px solid var(--border2);border-radius:var(--rs);padding:13px 16px;color:var(--text);font-family:var(--mono);font-size:13px;outline:none;margin-bottom:12px;display:block}
+.setup-input:focus{border-color:var(--accent)}
+.setup-input::placeholder{color:var(--text3)}
+.empty{text-align:center;padding:40px 20px;color:var(--text3)}
+.empty-icon{font-size:36px;margin-bottom:10px}
+.sec-lbl{font-size:11px;letter-spacing:1px;color:var(--text3);text-transform:uppercase;font-weight:600;margin:16px 0 8px}
+#toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--surface2);border:1px solid var(--border2);border-radius:var(--rs);padding:11px 18px;font-size:14px;z-index:999;opacity:0;transition:all .3s;pointer-events:none;white-space:nowrap;max-width:90vw;overflow:hidden;text-overflow:ellipsis}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+#toast.success{border-color:rgba(45,212,160,.4);color:var(--green)}
+#toast.error{border-color:rgba(255,107,107,.4);color:var(--red)}
+#toast.info{border-color:rgba(255,209,102,.4);color:var(--yellow)}
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <div class="tb-logo">BAR CAFE</div>
+  <button class="tb-sync" id="syncBtn" onclick="syncAll()">
+    <span id="syncIcon">☁️</span><span id="syncText">Sync</span>
+  </button>
+  <div class="tb-role">พนักงาน</div>
+</div>
+
+<!-- SETUP (แสดงถ้ายังไม่มี URL) -->
+<div id="setupScreen">
+  <div class="setup-wrap">
+    <div class="setup-icon">🔗</div>
+    <div class="setup-title">เชื่อมต่อ Google Sheets</div>
+    <div class="setup-desc">ขอ <strong>Apps Script URL</strong> จากเจ้าของร้าน<br>แล้ววางด้านล่างเพื่อเริ่มใช้งาน<br><br>ทำครั้งเดียว — จำไว้อัตโนมัติ</div>
+    <input class="setup-input" type="url" id="setupUrl" placeholder="https://script.google.com/macros/s/...">
+    <button class="btn btn-primary" style="max-width:360px" onclick="saveSetup()">✓ บันทึกและเชื่อมต่อ</button>
+  </div>
+</div>
+
+<!-- MAIN APP -->
+<div id="mainApp" style="display:none">
+
+  <!-- STOCK -->
+  <div id="pg-stock" class="page active">
+    <div class="page-title">สต็อกร้าน</div>
+    <div class="page-sub" id="subDate"></div>
+    <div class="stats-row" id="statsRow"></div>
+    <div id="alertStrips"></div>
+    <input class="search-box" type="search" placeholder="🔍  ค้นหาสินค้า..." id="searchInput" oninput="renderStock()">
+    <div class="filter-scroll">
+      <button class="filter-chip active" onclick="setFilter('all',this)">ทั้งหมด</button>
+      <button class="filter-chip danger" onclick="setFilter('low',this)">⚠ ต้องซื้อ</button>
+      <button class="filter-chip" onclick="setFilter('drink',this)">ชา/กาแฟ</button>
+      <button class="filter-chip" onclick="setFilter('syrup',this)">ไซรัป</button>
+      <button class="filter-chip" onclick="setFilter('snack',this)">ขนม</button>
+      <button class="filter-chip" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
+      <button class="filter-chip" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
+      <button class="filter-chip" onclick="setFilter('ing',this)">วัตถุดิบ</button>
+    </div>
+    <div class="stock-list" id="stockList"></div>
+  </div>
+
+  <!-- RECEIVE -->
+  <div id="pg-receive" class="page">
+    <div class="page-title">รับสินค้าเข้า</div>
+    <div class="page-sub">บันทึกของที่รับ — sync ขึ้น Sheets ทันที</div>
+    <div class="recv-form">
+      <div class="fg">
+        <label class="fl">เลือกสินค้า</label>
+        <select class="fi" id="recItem" onchange="fillUnit()"><option value="">— เลือกรายการ —</option></select>
+      </div>
+      <div class="fr">
+        <div class="fg">
+          <label class="fl">จำนวนที่รับ</label>
+          <input class="fi" type="number" id="recQty" min="0.5" step="0.5" placeholder="0" inputmode="decimal">
+        </div>
+        <div class="fg">
+          <label class="fl">หน่วย</label>
+          <input class="fi" type="text" id="recUnit" readonly placeholder="—" style="color:var(--text3)">
+        </div>
+      </div>
+      <div class="fg">
+        <label class="fl">รับเข้าที่</label>
+        <select class="fi" id="recLoc">
+          <option value="shop">📦 ร้าน</option>
+          <option value="home">🏠 บ้าน / สต็อกสำรอง</option>
+        </select>
+      </div>
+      <div class="fg">
+        <label class="fl">หมายเหตุ (ไม่บังคับ)</label>
+        <input class="fi" type="text" id="recNote" placeholder="เช่น ล็อตใหม่, วันหมดอายุ...">
+      </div>
+      <button class="btn btn-primary" id="recBtn" onclick="doReceive()">✓ บันทึกรับสินค้า</button>
+    </div>
+    <div class="sec-lbl" style="margin-top:20px">ประวัติวันนี้</div>
+    <div class="log-list" id="todayLog"></div>
+  </div>
+
+  <!-- SOURCING -->
+  <div id="pg-sourcing" class="page">
+    <div class="page-title">รายการต้องซื้อ</div>
+    <div class="page-sub">จัดกลุ่มตามแหล่งซื้อ ไม่เสียรอบ</div>
+    <div class="filter-scroll">
+      <button class="filter-chip active" onclick="setSrcFilter('low',this)">⚠ ต้องซื้อ</button>
+      <button class="filter-chip" onclick="setSrcFilter('all',this)">ทั้งหมด</button>
+    </div>
+    <div id="sourcingList"></div>
+  </div>
+
+  <!-- LOG -->
+  <div id="pg-log" class="page">
+    <div class="page-title">ประวัติรับสินค้า</div>
+    <div class="page-sub">ทุกการรับสินค้าของทีม</div>
+    <div class="log-list" id="fullLog"></div>
+  </div>
+
+</div>
+
+<nav class="bottom-nav" id="bottomNav" style="display:none">
+  <button class="bnav-item active" onclick="showPage('stock',this)"><div class="bnav-icon">📦</div><span>สต็อก</span></button>
+  <button class="bnav-item" onclick="showPage('receive',this)"><div class="bnav-icon">📥</div><span>รับสินค้า</span></button>
+  <button class="bnav-item" onclick="showPage('sourcing',this)"><div class="bnav-icon">🛒</div><span>ต้องซื้อ</span></button>
+  <button class="bnav-item" onclick="showPage('log',this)"><div class="bnav-icon">📋</div><span>ประวัติ</span></button>
+</nav>
+<div id="toast"></div>
+
+<script>
+const URL_KEY='bcStockScriptUrl', STOCK_KEY='bcStock', LOG_KEY='bcLog';
+const CAT_LABEL={drink:'ชา/กาแฟ',syrup:'ไซรัป',snack:'ขนม',cake:'เค้ก',bev:'เครื่องดื่ม',pack:'บรรจุภัณฑ์',ing:'วัตถุดิบ'};
+const CAT_CLS={drink:'cat-drink',syrup:'cat-syrup',snack:'cat-snack',cake:'cat-cake',bev:'cat-bev',pack:'cat-pack',ing:'cat-ing'};
+const SRC_LABEL={makro:'Makro',market:'ตลาด',shop:'ร้านค้า',online:'Online',etc:'อื่นๆ','':'ยังไม่ระบุ'};
+const SRC_CLS={makro:'src-makro',market:'src-market',shop:'src-shop',online:'src-online',etc:'src-etc','':'src-etc'};
+const SRC_ICON={makro:'🟢',market:'🟠',shop:'🟣',online:'🔵',etc:'⚫','':'⚪'};
+const SRC_META={
+  makro:{label:'Makro',icon:'🟢',desc:'ซื้อที่ Makro'},
+  market:{label:'ตลาด',icon:'🟠',desc:'ตลาดสด / ท้องถิ่น'},
+  shop:{label:'ร้านค้า',icon:'🟣',desc:'ร้านค้าปลีก'},
+  online:{label:'Online',icon:'🔵',desc:'Shopee / Lazada'},
+  etc:{label:'อื่นๆ',icon:'⚫',desc:'แหล่งอื่น'},
+  '':{label:'ยังไม่ระบุ',icon:'⚪',desc:'ยังไม่กำหนด'},
+};
+
+let items=[], log=[], curFilter='all', curSrcFilter='low', scriptUrl='', isSyncing=false;
+
+/* ---- INIT ---- */
+function init(){
+  scriptUrl=localStorage.getItem(URL_KEY)||'';
+  items=JSON.parse(localStorage.getItem(STOCK_KEY)||'[]');
+  log=JSON.parse(localStorage.getItem(LOG_KEY)||'[]');
+  const el=document.getElementById('subDate');
+  if(el) el.textContent=new Date().toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+  if(!scriptUrl){
+    show('setupScreen'); hide('mainApp'); hide('bottomNav');
+  } else {
+    hide('setupScreen'); show('mainApp'); showFlex('bottomNav');
+    renderStock();
+    syncAll();
+  }
+}
+function show(id){document.getElementById(id).style.display='block'}
+function hide(id){document.getElementById(id).style.display='none'}
+function showFlex(id){document.getElementById(id).style.display='flex'}
+
+function saveSetup(){
+  const url=document.getElementById('setupUrl').value.trim();
+  if(!url.startsWith('https://script.google.com')){toast('URL ไม่ถูกต้อง','error');return;}
+  localStorage.setItem(URL_KEY,url); scriptUrl=url;
+  hide('setupScreen'); show('mainApp'); showFlex('bottomNav');
+  renderStock(); syncAll();
+}
+
+/* ---- SYNC ---- */
+function setSyncUI(state){
+  const btn=document.getElementById('syncBtn');
+  const icon=document.getElementById('syncIcon');
+  const text=document.getElementById('syncText');
+  btn.className='tb-sync '+state;
+  const map={syncing:['🔄','กำลัง sync…'],ok:['✅','Synced'],err:['⚠️','ล้มเหลว'],''  :['☁️','Sync']};
+  [icon.textContent,text.textContent]=map[state]||map[''];
+}
+
+async function syncAll(){
+  if(isSyncing||!scriptUrl) return;
+  isSyncing=true; setSyncUI('syncing');
+  try{
+    const [r1,r2]=await Promise.all([
+      fetch(scriptUrl+'?type=stock',{cache:'no-cache'}),
+      fetch(scriptUrl+'?type=log',{cache:'no-cache'}),
+    ]);
+    const d1=await r1.json(), d2=await r2.json();
+    if(d1.ok&&d1.data.length){items=d1.data; localStorage.setItem(STOCK_KEY,JSON.stringify(items));}
+    if(d2.ok){log=d2.data; localStorage.setItem(LOG_KEY,JSON.stringify(log));}
+    setSyncUI('ok');
+    renderAll();
+    toast('Sync เรียบร้อย ✓','success');
+    setTimeout(()=>setSyncUI(''),3000);
+  }catch(e){
+    setSyncUI('err');
+    toast('Sync ล้มเหลว — ใช้ข้อมูล offline','error');
+    renderAll();
+    setTimeout(()=>setSyncUI(''),4000);
+  }finally{isSyncing=false;}
+}
+
+async function pushItem(item){
+  if(!scriptUrl) return;
+  await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'updateItem',id:item.id,shop:item.shop,home:item.home})});
+}
+async function pushLog(entry){
+  if(!scriptUrl) return;
+  await fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'addLog',entry})});
+}
+
+/* ---- HELPERS ---- */
+function st(x){
+  if(+x.shop===0&&+x.home===0) return 'out';
+  if(+x.shop<+x.min) return 'low';
+  return 'ok';
+}
+function pct(x){return +x.min<=0?100:Math.min(100,Math.round(+x.shop/+x.min*100));}
+
+/* ---- RENDER ALL ---- */
+function renderAll(){
+  renderStock();
+  if(document.getElementById('pg-receive').classList.contains('active')){fillRecSelect();renderTodayLog();}
+  if(document.getElementById('pg-sourcing').classList.contains('active')) renderSourcing();
+  if(document.getElementById('pg-log').classList.contains('active')) renderFullLog();
+}
+
+/* ---- STOCK ---- */
+function setFilter(f,btn){
+  curFilter=f;
+  document.querySelectorAll('#pg-stock .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderStock();
+}
+
+function renderStock(){
+  const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
+  let list=items.filter(x=>x.n.toLowerCase().includes(q));
+  if(curFilter==='low') list=list.filter(x=>st(x)!=='ok');
+  else if(curFilter!=='all') list=list.filter(x=>x.cat===curFilter);
+  list.sort((a,b)=>{const m={out:0,low:1,ok:2};return m[st(a)]-m[st(b)];});
+
+  const total=items.length, out=items.filter(x=>st(x)==='out').length, low=items.filter(x=>st(x)==='low').length;
+  document.getElementById('statsRow').innerHTML=`
+    <div class="stat-card"><div class="stat-val" style="color:var(--text)">${total}</div><div class="stat-lbl">ทั้งหมด</div></div>
+    <div class="stat-card warn"><div class="stat-val" style="color:var(--yellow)">${low}</div><div class="stat-lbl">ใกล้หมด</div></div>
+    <div class="stat-card danger"><div class="stat-val" style="color:var(--red)">${out}</div><div class="stat-lbl">หมดแล้ว</div></div>`;
+
+  let alerts='';
+  items.filter(x=>st(x)==='out').slice(0,3).forEach(x=>{
+    alerts+=`<div class="alert-strip"><div class="adot"></div><span><strong>${x.n}</strong> — หมดแล้ว</span></div>`;
+  });
+  items.filter(x=>st(x)==='low').slice(0,2).forEach(x=>{
+    alerts+=`<div class="alert-strip warn"><div class="adot warn"></div><span><strong>${x.n}</strong> — เหลือ ${x.shop} ${x.u}</span></div>`;
+  });
+  document.getElementById('alertStrips').innerHTML=alerts;
+
+  if(!list.length){
+    document.getElementById('stockList').innerHTML=`<div class="empty"><div class="empty-icon">🔍</div><div style="font-size:14px">ไม่พบรายการ</div></div>`;
+    return;
+  }
+  document.getElementById('stockList').innerHTML=list.map(x=>{
+    const s=st(x),p=pct(x),c=s==='out'?'var(--red)':s==='low'?'var(--yellow)':'var(--text)',sk=x.src||'';
+    return `<div class="stock-card s-${s}">
+      <div class="sc-left">
+        <div class="sc-name">${x.n}</div>
+        <div class="sc-meta">
+          <span class="sc-badge ${CAT_CLS[x.cat]||''}">${CAT_LABEL[x.cat]||x.cat}</span>
+          <span class="sc-badge ${SRC_CLS[sk]}">${SRC_ICON[sk]} ${SRC_LABEL[sk]}</span>
+          ${+x.home>0?`<span style="color:var(--text3);font-size:11px">🏠${x.home}${x.u}</span>`:''}
+        </div>
+        <div class="prog-bar"><div class="prog-fill pf-${s}" style="width:${p}%"></div></div>
+      </div>
+      <div class="sc-right">
+        <div><div class="sc-num" style="color:${c}">${x.shop}</div><div class="sc-unit">${x.u}</div></div>
+        <div class="adj-btns">
+          <button class="adj-btn minus" onclick="adj(${x.id},-1)" ${+x.shop<=0?'disabled':''}>−</button>
+          <button class="adj-btn plus" onclick="adj(${x.id},+1)">+</button>
+        </div>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+function adj(id,delta){
+  const item=items.find(x=>+x.id===+id); if(!item) return;
+  item.shop=Math.max(0,+item.shop+delta);
+  localStorage.setItem(STOCK_KEY,JSON.stringify(items));
+  renderStock();
+  pushItem(item).catch(()=>{});
+  toast(`${item.n}: ${item.shop} ${item.u}`,'success');
+}
+
+/* ---- RECEIVE ---- */
+function fillRecSelect(){
+  const sel=document.getElementById('recItem'); if(!sel) return;
+  const cur=sel.value;
+  sel.innerHTML='<option value="">— เลือกรายการ —</option>';
+  [...items].sort((a,b)=>a.n.localeCompare(b.n,'th')).forEach(x=>{
+    sel.innerHTML+=`<option value="${x.id}" data-unit="${x.u}">${x.n} (${x.u})</option>`;
+  });
+  if(cur) sel.value=cur;
+}
+function fillUnit(){
+  const sel=document.getElementById('recItem'), opt=sel.options[sel.selectedIndex];
+  document.getElementById('recUnit').value=opt?(opt.dataset.unit||''):'';
+}
+
+async function doReceive(){
+  const id=document.getElementById('recItem').value;
+  const qty=+document.getElementById('recQty').value;
+  const loc=document.getElementById('recLoc').value;
+  const note=document.getElementById('recNote').value.trim();
+  if(!id||!qty){toast('กรุณาเลือกสินค้าและระบุจำนวน','error');return;}
+  const item=items.find(x=>+x.id===+id); if(!item) return;
+  item[loc]=+item[loc]+qty;
+  localStorage.setItem(STOCK_KEY,JSON.stringify(items));
+  const entry={id:Date.now(),name:item.n,cat:item.cat,qty,unit:item.u,loc,note,
+    date:new Date().toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})};
+  log.push(entry);
+  localStorage.setItem(LOG_KEY,JSON.stringify(log));
+  document.getElementById('recItem').value='';
+  document.getElementById('recQty').value='';
+  document.getElementById('recNote').value='';
+  document.getElementById('recUnit').value='';
+  const btn=document.getElementById('recBtn');
+  btn.disabled=true; btn.textContent='⏳ กำลัง sync…';
+  try{
+    await Promise.all([pushItem(item),pushLog(entry)]);
+    toast(`รับ ${item.n} +${qty} ${item.u} — sync แล้ว ✓`,'success');
+  }catch(e){
+    toast(`บันทึกแล้ว (offline) — sync ครั้งหน้า`,'info');
+  }
+  btn.disabled=false; btn.textContent='✓ บันทึกรับสินค้า';
+  renderStock(); renderTodayLog();
+}
+
+function renderTodayLog(){
+  const todayStr=new Date().toLocaleDateString('th-TH');
+  const today=[...log].reverse().filter(l=>{
+    try{return new Date(+l.id).toLocaleDateString('th-TH')===todayStr;}catch(e){return true;}
+  });
+  const el=document.getElementById('todayLog');
+  el.innerHTML=today.length?today.map(logCard).join(''):`<div class="empty"><div class="empty-icon">📭</div><div style="font-size:14px">ยังไม่มีการรับสินค้าวันนี้</div></div>`;
+}
+
+function renderFullLog(){
+  const el=document.getElementById('fullLog');
+  el.innerHTML=log.length?[...log].reverse().map(logCard).join(''):`<div class="empty"><div class="empty-icon">📭</div><div style="font-size:14px">ยังไม่มีประวัติ</div></div>`;
+}
+
+function logCard(l){
+  return `<div class="log-card">
+    <div><div class="log-name">${l.name}</div><div class="log-meta">${CAT_LABEL[l.cat]||l.cat}${l.note?' · '+l.note:''} · ${l.loc==='home'?'🏠 บ้าน':'📦 ร้าน'}</div></div>
+    <div><div class="log-qty">+${l.qty} ${l.unit}</div><div class="log-date">${l.date}</div></div>
+  </div>`;
+}
+
+/* ---- SOURCING ---- */
+function setSrcFilter(f,btn){
+  curSrcFilter=f;
+  document.querySelectorAll('#pg-sourcing .filter-chip').forEach(b=>b.classList.remove('active'));
+  btn.classList.add('active'); renderSourcing();
+}
+
+function renderSourcing(){
+  const list=curSrcFilter==='low'?items.filter(x=>st(x)!=='ok'):items;
+  let html='';
+  ['makro','market','shop','online','etc',''].forEach(key=>{
+    const group=list.filter(x=>(x.src||'')===key);
+    if(!group.length) return;
+    const meta=SRC_META[key];
+    const need=group.filter(x=>st(x)!=='ok').length;
+    const rows=group.sort((a,b)=>{const m={out:0,low:1,ok:2};return m[st(a)]-m[st(b)];}).map(x=>{
+      const s=st(x),c=s==='out'?'var(--red)':s==='low'?'var(--yellow)':'var(--green)';
+      const lbl=s==='out'?'หมด':s==='low'?`${x.shop}${x.u} (ต่ำ)`:`${x.shop}${x.u}`;
+      return `<div class="src-row"><span>${x.n}</span>
+        <span style="color:${c};font-size:13px;font-family:var(--mono);display:flex;align-items:center">
+          <span class="src-dot" style="background:${c}"></span>${lbl}
+        </span></div>`;
+    }).join('');
+    html+=`<div class="src-section">
+      <div class="src-header">
+        <span class="src-icon">${meta.icon}</span>
+        <div><div class="src-name-lbl">${meta.label}</div><div style="font-size:11px;color:var(--text3)">${meta.desc}</div></div>
+        <div style="margin-left:auto;display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+          ${need?`<span style="font-size:11px;padding:2px 8px;border-radius:99px;background:var(--red-bg);color:var(--red);font-weight:600">ต้องซื้อ ${need}</span>`:'<span style="color:var(--green);font-size:12px">✓ ครบ</span>'}
+          <span style="font-size:12px;color:var(--text3);font-family:var(--mono)">${group.length} รายการ</span>
+        </div>
+      </div>
+      <div class="src-items">${rows}</div>
+    </div>`;
+  });
+  if(!html) html=`<div class="empty"><div class="empty-icon">✅</div><div style="font-size:14px">สต็อกทุกรายการปกติดี</div></div>`;
+  document.getElementById('sourcingList').innerHTML=html;
+}
+
+/* ---- NAV ---- */
+function showPage(p,btn){
+  document.querySelectorAll('.page').forEach(x=>x.classList.remove('active'));
+  document.querySelectorAll('.bnav-item').forEach(x=>x.classList.remove('active'));
+  document.getElementById('pg-'+p).classList.add('active');
+  btn.classList.add('active');
+  if(p==='receive'){fillRecSelect();renderTodayLog();}
+  if(p==='sourcing') renderSourcing();
+  if(p==='log') renderFullLog();
+  if(p==='stock') renderStock();
+}
+
+/* ---- TOAST ---- */
+function toast(msg,type){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.className='show '+(type||'');
+  clearTimeout(t._t); t._t=setTimeout(()=>t.className='',3000);
+}
+
+init();
+</script>
+</body>
+</html>
