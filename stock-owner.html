@@ -880,8 +880,8 @@ function setSrcFilter(f, btn){
 function renderSourcing(){
   const srcKeys = ['makro','market','shop','online','etc',''];
   const srcMeta = {
-    makro:  {label:'Makro',       icon:'🟢', desc:'ซื้อที่ Makro'},
-    market: {label:'ตลาด',        icon:'🟠', desc:'ตลาดสด / ตลาดท้องถิ่น'},
+    makro:  {label:'Makro',       icon:'🟠', desc:'ซื้อที่ Makro'},
+    market: {label:'ตลาด',        icon:'🟢', desc:'ตลาดสด / ตลาดท้องถิ่น'},
     shop:   {label:'ร้านค้า',     icon:'🟣', desc:'ร้านค้าปลีก / ร้านเฉพาะ'},
     online: {label:'Online',      icon:'🔵', desc:'สั่งออนไลน์ / Shopee / Lazada'},
     etc:    {label:'อื่นๆ',       icon:'⚫', desc:'แหล่งอื่น'},
@@ -1032,6 +1032,7 @@ function doAdjust(){
   item.shop = +document.getElementById('adjShop').value||0;
   item.home = +document.getElementById('adjHome').value||0;
   saveItems(); closeModal('adjOverlay'); renderAll();
+  if(scriptUrl) fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'updateItem',id:item.id,shop:item.shop,home:item.home})}).catch(()=>{});
   toast('บันทึกสต็อกเรียบร้อย','success');
 }
 
@@ -1081,6 +1082,7 @@ function openEditModal(id){
   document.getElementById('iShop').value=x.shop;
   document.getElementById('iHome').value=x.home;
   document.getElementById('iMin').value=x.min;
+  document.getElementById('iSrc').value=x.src||'';
   document.getElementById('iEditId').value=id;
   openModal('itemOverlay');
 }
@@ -1092,14 +1094,15 @@ function saveItem(){
   const shop=+document.getElementById('iShop').value||0;
   const home=+document.getElementById('iHome').value||0;
   const min=+document.getElementById('iMin').value||0;
+  const src=document.getElementById('iSrc').value||'';
   if(!name||!u){ toast('กรุณากรอกชื่อสินค้าและหน่วย','error'); return; }
   const eid=+document.getElementById('iEditId').value;
   if(eid){
     const item=items.find(x=>x.id===eid);
-    if(item) Object.assign(item,{n:name,cat,u,shop,home,min});
+    if(item) Object.assign(item,{n:name,cat,u,shop,home,min,src});
     toast('แก้ไขรายการเรียบร้อย','success');
   } else {
-    items.push({id:nextId(),n:name,cat,u,shop,home,min});
+    items.push({id:nextId(),n:name,cat,u,shop,home,min,src});
     toast('เพิ่มรายการใหม่เรียบร้อย','success');
   }
   saveItems(); closeModal('itemOverlay'); renderAll();
