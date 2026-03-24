@@ -415,8 +415,8 @@ function renderStock(){
       <div class="sc-right">
         <div><div class="sc-num" style="color:${c}">${x.shop}</div><div class="sc-unit">${x.u}</div></div>
         <div class="adj-btns">
-          <button class="adj-btn minus" onclick="adj(${x.id},-1)" ${+x.shop<=0?'disabled':''}>−</button>
-          <button class="adj-btn plus" onclick="adj(${x.id},+1)">+</button>
+          <button class="adj-btn minus" onclick="adj(${x.id},-0.5)" ${+x.shop<=0?'disabled':''}>−</button>
+          <button class="adj-btn plus" onclick="adj(${x.id},+0.5)">+</button>
         </div>
       </div>
     </div>`;
