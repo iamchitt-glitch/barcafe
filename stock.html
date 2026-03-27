@@ -170,6 +170,7 @@ select.fi option{background:var(--bg3)}
       <button class="filter-chip" onclick="setFilter('drink',this)">ชา/กาแฟ</button>
       <button class="filter-chip" onclick="setFilter('syrup',this)">ไซรัป</button>
       <button class="filter-chip" onclick="setFilter('snack',this)">ขนม</button>
+      <button class="filter-chip" onclick="setFilter('cake',this)">เบเกอรี่</button>
       <button class="filter-chip" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
       <button class="filter-chip" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
       <button class="filter-chip" onclick="setFilter('ing',this)">วัตถุดิบ</button>
@@ -358,6 +359,12 @@ function st(x){
   return 'ok';
 }
 function pct(x){return +x.min<=0?100:Math.min(100,Math.round(+x.shop/+x.min*100));}
+function daysUntilExp(exp){
+  if(!exp) return 999;
+  const d=new Date(exp); d.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.round((d-today)/(1000*60*60*24));
+}
 
 /* ---- RENDER ALL ---- */
 function renderAll(){
@@ -394,6 +401,11 @@ function renderStock(){
   items.filter(x=>st(x)==='low').slice(0,2).forEach(x=>{
     alerts+=`<div class="alert-strip warn"><div class="adot warn"></div><span><strong>${x.n}</strong> — เหลือ ${x.shop} ${x.u}</span></div>`;
   });
+  // แจ้งเตือนวันหมดอายุ ≤ 3 วัน
+  items.filter(x=>x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0).forEach(x=>{
+    const d=daysUntilExp(x.exp);
+    alerts+=`<div class="alert-strip" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3)"><div class="adot" style="background:#ff9632;animation:none"></div><span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
+  });
   document.getElementById('alertStrips').innerHTML=alerts;
 
   if(!list.length){
@@ -408,7 +420,8 @@ function renderStock(){
         <div class="sc-meta">
           <span class="sc-badge ${CAT_CLS[x.cat]||''}">${CAT_LABEL[x.cat]||x.cat}</span>
           <span class="sc-badge ${SRC_CLS[sk]}">${SRC_ICON[sk]} ${SRC_LABEL[sk]}</span>
-          ${+x.home>0?`<span style="color:var(--text3);font-size:11px">🏠${x.home}${x.u}</span>`:''}
+          ${+x.home>0?`<span style="color:#7ee8c8;font-size:13px;font-weight:600;background:rgba(45,212,160,.12);padding:2px 8px;border-radius:99px">🏠 ${x.home} ${x.u}</span>`:''}
+          ${x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0?`<span style="color:var(--red);font-size:11px;font-weight:600;background:var(--red-bg);padding:2px 7px;border-radius:99px">⏰ หมด${daysUntilExp(x.exp)===0?'วันนี้':daysUntilExp(x.exp)+' วัน'}</span>`:''}
         </div>
         <div class="prog-bar"><div class="prog-fill pf-${s}" style="width:${p}%"></div></div>
       </div>
@@ -539,10 +552,16 @@ function renderFullLog(){
   el.innerHTML=log.length?[...log].reverse().map(logCard).join(''):`<div class="empty"><div class="empty-icon">📭</div><div style="font-size:14px">ยังไม่มีประวัติ</div></div>`;
 }
 
+function fmtDate(raw){
+  if(!raw) return '';
+  // ตัด timezone suffix เช่น GMT+0700 (เวลาอินโดจีน) ออก
+  return String(raw).replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
+}
+
 function logCard(l){
   return `<div class="log-card">
     <div><div class="log-name">${l.name}</div><div class="log-meta">${CAT_LABEL[l.cat]||l.cat}${l.note?' · '+l.note:''} · ${l.loc==='home'?'🏠 บ้าน':'📦 ร้าน'}</div></div>
-    <div><div class="log-qty">+${l.qty} ${l.unit}</div><div class="log-date">${l.date}</div></div>
+    <div><div class="log-qty">+${l.qty} ${l.unit}</div><div class="log-date">${fmtDate(l.date)}</div></div>
   </div>`;
 }
 
