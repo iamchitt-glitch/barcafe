@@ -130,6 +130,7 @@ tr:hover td{background:rgba(255,255,255,.018)}
 .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.72);z-index:200;align-items:center;justify-content:center}
 .overlay.show{display:flex}
 .modal{background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:26px 28px;width:460px;max-width:94vw;max-height:88vh;overflow-y:auto}
+.modal:has(input[type="date"]:focus){overflow:visible}
 .modal-title{font-size:18px;font-weight:700;margin-bottom:20px}
 .mclose{float:right;background:var(--surface);border:none;color:var(--text2);width:30px;height:30px;border-radius:6px;cursor:pointer;font-size:16px;display:flex;align-items:center;justify-content:center;margin-top:-2px}
 .mclose:hover{background:var(--surface2);color:var(--text)}
@@ -481,12 +482,13 @@ select.fi option{background:var(--bg3)}
       <div class="fg" style="margin-bottom:0">
         <label class="fl">หมวดบัญชี</label>
         <select class="fi" id="recCostCat">
-          <option value="Mixed">Mixed</option>
-          <option value="Beverages">Beverages</option>
-          <option value="Bakery">Bakery</option>
-          <option value="Appetizer">Appetizer</option>
-          <option value="Fruits">Fruits</option>
-          <option value="Snack">Snack</option>
+          <option value="ชา/กาแฟ">ชา/กาแฟ</option>
+          <option value="ไซรัป">ไซรัป</option>
+          <option value="ขนม">ขนม</option>
+          <option value="เบเกอรี่">เบเกอรี่</option>
+          <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+          <option value="บรรจุภัณฑ์">บรรจุภัณฑ์</option>
+          <option value="วัตถุดิบ (อื่นๆ)">วัตถุดิบ (อื่นๆ)</option>
         </select>
       </div>
     </div>
@@ -553,8 +555,10 @@ select.fi option{background:var(--bg3)}
   </div>
   <div class="fg">
     <label class="fl">วันหมดอายุ (ไม่บังคับ — สำหรับของสด/เบเกอรี่)</label>
-    <input class="fi" type="date" id="iExp">
-    <div class="fhint">ระบบจะแจ้งเตือน 3 วันก่อนหมดอายุ</div>
+    <input class="fi" type="date" id="iExp"
+      style="color-scheme:dark;-webkit-appearance:none;appearance:none"
+      min="2025-01-01" max="2030-12-31">
+    <div class="fhint">เลือกวันจาก calendar หรือพิมพ์แบบ ปปปป-ดด-วว เช่น 2025-04-30 · แจ้งเตือน 3 วันก่อนหมดอายุ</div>
   </div>
   <input type="hidden" id="iEditId">
   <div style="display:flex;gap:8px;margin-top:6px">
@@ -1155,7 +1159,7 @@ function doReceive(){
   const loc=document.getElementById('recLoc').value;
   const note=document.getElementById('recNote').value.trim();
   const cost=+document.getElementById('recCost').value||0;
-  const costCat=document.getElementById('recCostCat').value||'Mixed';
+  const costCat=document.getElementById('recCostCat').value||'วัตถุดิบ (อื่นๆ)';
   if(!id||!qty){ toast('กรุณาเลือกสินค้าและระบุจำนวน','error'); return; }
   const item=items.find(x=>x.id===id);
   if(!item) return;
@@ -1277,8 +1281,22 @@ function toast(msg, type='success'){
 
 // ===================== INIT =====================
 document.getElementById('todayDate').textContent = new Date().toLocaleDateString('th-TH',{weekday:'long',year:'numeric',month:'long',day:'numeric'});
+
+// แก้ date picker บน Chrome Android — ปิด overflow ชั่วคราวตอน focus
+document.addEventListener('focusin', e=>{
+  if(e.target.type==='date'){
+    const modal=e.target.closest('.modal');
+    if(modal){ modal._ov=modal.style.overflow; modal.style.overflow='visible'; }
+  }
+});
+document.addEventListener('focusout', e=>{
+  if(e.target.type==='date'){
+    const modal=e.target.closest('.modal');
+    if(modal) modal.style.overflow=modal._ov||'';
+  }
+});
+
 renderAll();
-// Auto-sync เมื่อเปิดหน้า ถ้ามี URL แล้ว
 if(scriptUrl) syncAll();
 </script>
 </body>
