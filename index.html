@@ -118,7 +118,7 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
   </div>
   <div class="g2">
     <div class="mc"><div class="ml">กำไร / ขาดทุน</div><div class="mv" id="dProfit">฿0</div><div class="ms" id="dMargin">Margin 0%</div></div>
-    <div class="mc"><div class="ml">เฉลี่ย/วัน</div><div class="mv ca" id="dAvg">฿0</div><div class="ms">เป้า ฿3,300</div></div>
+    <div class="mc"><div class="ml">เฉลี่ย/วัน</div><div class="mv ca" id="dAvg">฿0</div><div class="ms" id="dAvgTarget">เป้า ฿3,300</div></div>
   </div>
   <div class="card">
     <div class="clbl">เทียบเป้ารายเดือน</div>
@@ -583,7 +583,8 @@ function renderDash(){
   const dim=new Date(+y,+mo,0).getDate();
   const tgt=c.target*dim;
   const tp=Math.min(tI>0?Math.round(tI/tgt*100):0,100);
-  const tMat =exp.filter(e=>MAT_CATS.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
+  const MAT_ALL=[...MAT_CATS,'Mixed','Appetizer','Beverages','Fruits','Bakery','Snack'];
+  const tMat =exp.filter(e=>MAT_ALL.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
   const tOpe =exp.filter(e=>OPE_CATS.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
   const tWage=exp.filter(e=>WAGE_CATS.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
   const s1=inc.reduce((s,i)=>s+(parseInt(i.staff1)||0),0);
@@ -597,6 +598,7 @@ function renderDash(){
   dp.textContent=fmt(prof);dp.className='mv '+(prof>=0?'cg':'cr');
   document.getElementById('dMargin').textContent=`Margin ${pct(prof,tI)}%`;
   document.getElementById('dAvg').textContent=fmt(avg);
+  document.getElementById('dAvgTarget').textContent='เป้า '+fmt(c.target);
   document.getElementById('tLbl').textContent=`เป้า ${fmt(tgt)}`;
   document.getElementById('tPct').textContent=tp+'%';
   const bar=document.getElementById('tBar');
