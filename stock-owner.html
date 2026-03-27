@@ -294,13 +294,13 @@ select.fi option{background:var(--bg3)}
   <div class="filter-row">
     <input class="search-box" type="text" placeholder="🔍  ค้นหาชื่อสินค้า..." id="searchInput" oninput="renderTable()">
     <button class="filter-btn active" onclick="setFilter('all',this)">ทั้งหมด</button>
+    <button class="filter-btn" onclick="setFilter('ing',this)">วัตถุดิบ</button>
     <button class="filter-btn" onclick="setFilter('drink',this)">ชา/กาแฟ</button>
     <button class="filter-btn" onclick="setFilter('syrup',this)">ไซรัป</button>
     <button class="filter-btn" onclick="setFilter('snack',this)">ขนม</button>
     <button class="filter-btn" onclick="setFilter('cake',this)">เบเกอรี่</button>
     <button class="filter-btn" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
     <button class="filter-btn" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
-    <button class="filter-btn" onclick="setFilter('ing',this)">วัตถุดิบ</button>
     <button class="filter-btn" onclick="setFilter('low',this)" style="color:var(--yellow);border-color:rgba(255,209,102,.3)">⚠ ต่ำ/หมด</button>
   </div>
 
@@ -1048,7 +1048,7 @@ function fillRecSelect(){
   if(!sel) return;
   const cur = sel.value;
   sel.innerHTML = `<option value="">— เลือกหมวดและรายการ —</option>`;
-  const catOrder=['drink','syrup','snack','cake','bev','pack','ing'];
+  const catOrder=['ing','drink','syrup','snack','cake','bev','pack'];
   catOrder.forEach(cat=>{
     const group = items.filter(x=>x.cat===cat);
     if(!group.length) return;
