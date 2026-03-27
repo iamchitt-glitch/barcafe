@@ -197,12 +197,13 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
       <div class="field"><label>หมวดหมู่</label>
         <select id="eCat">
           <optgroup label="── วัตถุดิบ ──">
-            <option value="Mixed">Mixed</option>
-            <option value="Appetizer">Appetizer</option>
-            <option value="Beverages">Beverages</option>
-            <option value="Fruits">Fruits</option>
-            <option value="Bakery">Bakery</option>
-            <option value="Snack">Snack</option>
+            <option value="ชา/กาแฟ">ชา/กาแฟ</option>
+            <option value="ไซรัป">ไซรัป</option>
+            <option value="ขนม">ขนม</option>
+            <option value="เบเกอรี่">เบเกอรี่</option>
+            <option value="เครื่องดื่ม">เครื่องดื่ม</option>
+            <option value="บรรจุภัณฑ์">บรรจุภัณฑ์</option>
+            <option value="วัตถุดิบ (อื่นๆ)">วัตถุดิบ (อื่นๆ)</option>
           </optgroup>
           <optgroup label="── ค่าใช้จ่าย ──">
             <option value="Rent">Rent</option>
@@ -277,12 +278,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
 <div id="toast"></div>
 
 <script>
-const MAT_CATS  = ['Mixed','Appetizer','Beverages','Fruits','Bakery','Snack'];
+const MAT_CATS  = ['ชา/กาแฟ','ไซรัป','ขนม','เบเกอรี่','เครื่องดื่ม','บรรจุภัณฑ์','วัตถุดิบ (อื่นๆ)'];
 const OPE_CATS  = ['Rent','Utility','Maintenance','MKT','Etc'];
 const WAGE_CATS = ['Wage'];
 const ALL_CATS  = [...MAT_CATS,...OPE_CATS,...WAGE_CATS];
-const CAT_MAP   = {'วัตถุดิบ':'Mixed','ค่าแรง':'Wage','ค่าเช่า':'Rent','ค่าไฟน้ำ':'Utility','ซ่อมบำรุง':'Maintenance','อื่นๆ':'Etc'};
-const CAT_CLS   = {Mixed:'bg',Appetizer:'bg',Beverages:'bg',Fruits:'bg',Bakery:'bg',Snack:'bg',Rent:'bb',Utility:'bb',Maintenance:'bb',MKT:'ba',Etc:'bb',Wage:'br'};
+const CAT_MAP   = {'วัตถุดิบ':'วัตถุดิบ (อื่นๆ)','ค่าแรง':'Wage','ค่าเช่า':'Rent','ค่าไฟน้ำ':'Utility','ซ่อมบำรุง':'Maintenance','อื่นๆ':'Etc','Mixed':'วัตถุดิบ (อื่นๆ)','Appetizer':'ชา/กาแฟ','Beverages':'เครื่องดื่ม','Fruits':'วัตถุดิบ (อื่นๆ)','Bakery':'เบเกอรี่','Snack':'ขนม'};
+const CAT_CLS   = {'ชา/กาแฟ':'bg','ไซรัป':'bg','ขนม':'bg','เบเกอรี่':'bg','เครื่องดื่ม':'bg','บรรจุภัณฑ์':'bg','วัตถุดิบ (อื่นๆ)':'bg',Rent:'bb',Utility:'bb',Maintenance:'bb',MKT:'ba',Etc:'bb',Wage:'br'};
 const DAY = ['อา','จ','อ','พ','พฤ','ศ','ส'];
 const MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
