@@ -296,6 +296,7 @@ select.fi option{background:var(--bg3)}
     <button class="filter-btn" onclick="setFilter('drink',this)">ชา/กาแฟ</button>
     <button class="filter-btn" onclick="setFilter('syrup',this)">ไซรัป</button>
     <button class="filter-btn" onclick="setFilter('snack',this)">ขนม</button>
+    <button class="filter-btn" onclick="setFilter('cake',this)">เบเกอรี่</button>
     <button class="filter-btn" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
     <button class="filter-btn" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
     <button class="filter-btn" onclick="setFilter('low',this)" style="color:var(--yellow);border-color:rgba(255,209,102,.3)">⚠ ต่ำ/หมด</button>
@@ -419,6 +420,18 @@ select.fi option{background:var(--bg3)}
         Script URL ที่พนักงานต้องกรอก: <span id="scriptUrlDisplay" style="color:var(--text2)">—</span>
       </div>
     </div>
+
+    <div class="card" style="padding:20px">
+      <div style="font-weight:600;margin-bottom:6px;font-size:15px">💰 เชื่อมระบบบัญชี (Auto บันทึกรายจ่าย)</div>
+      <div style="font-size:13px;color:var(--text2);margin-bottom:14px">เมื่อรับสินค้าพร้อมกรอกค่าใช้จ่าย จะส่งไปบันทึกรายจ่ายที่ระบบบัญชีโดยอัตโนมัติ</div>
+      <div class="fg">
+        <label class="fl">Apps Script URL ของระบบบัญชี</label>
+        <input class="fi" type="url" id="acctUrlInput" placeholder="https://script.google.com/macros/s/...">
+        <div class="fhint">ดูได้จากหน้าตั้งค่าของ <a href="https://iamchitt-glitch.github.io/barcafe/" target="_blank" style="color:var(--accent)">ระบบบัญชีร้าน</a> → Apps Script URL</div>
+      </div>
+      <button class="btn btn-primary btn-sm" onclick="saveAcctUrl()" style="width:auto;padding:8px 16px">✓ บันทึก URL บัญชี</button>
+      <div id="acctUrlStatus" style="margin-top:10px;font-size:12px;color:var(--text3)"></div>
+    </div>
   </div>
 </div>
 
@@ -457,6 +470,27 @@ select.fi option{background:var(--bg3)}
   <div class="fg">
     <label class="fl">หมายเหตุ (ไม่บังคับ)</label>
     <input class="fi" type="text" id="recNote" placeholder="เช่น ล็อตใหม่, วันหมดอายุ...">
+  </div>
+  <div class="fg" style="background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.2);border-radius:var(--rs);padding:12px">
+    <label class="fl" style="color:var(--accent)">💰 บันทึกค่าใช้จ่าย (ไปหน้าบัญชีอัตโนมัติ)</label>
+    <div class="fr" style="margin-bottom:10px">
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl">จำนวนเงิน (บาท)</label>
+        <input class="fi" type="number" id="recCost" min="0" step="1" placeholder="0">
+      </div>
+      <div class="fg" style="margin-bottom:0">
+        <label class="fl">หมวดบัญชี</label>
+        <select class="fi" id="recCostCat">
+          <option value="Mixed">Mixed</option>
+          <option value="Beverages">Beverages</option>
+          <option value="Bakery">Bakery</option>
+          <option value="Appetizer">Appetizer</option>
+          <option value="Fruits">Fruits</option>
+          <option value="Snack">Snack</option>
+        </select>
+      </div>
+    </div>
+    <div class="fhint" style="color:var(--text3)">ถ้ากรอกจำนวนเงิน จะส่งไปบันทึกรายจ่ายที่ระบบบัญชีโดยอัตโนมัติ</div>
   </div>
   <div style="display:flex;gap:8px;margin-top:6px">
     <button class="btn btn-primary" style="flex:1" onclick="doReceive()">✓ บันทึกรับสินค้า</button>
@@ -510,12 +544,17 @@ select.fi option{background:var(--bg3)}
     <label class="fl">แหล่งซื้อสินค้า</label>
     <select class="fi" id="iSrc">
       <option value="">— ยังไม่ได้ระบุ —</option>
-      <option value="makro">🟢 Makro</option>
-      <option value="market">🟠 ตลาด (Market)</option>
+      <option value="makro">🟠 Makro</option>
+      <option value="market">🟢 ตลาด (Market)</option>
       <option value="shop">🟣 ร้านค้า (Shop)</option>
       <option value="online">🔵 Online</option>
       <option value="etc">⚫ อื่นๆ (Etc.)</option>
     </select>
+  </div>
+  <div class="fg">
+    <label class="fl">วันหมดอายุ (ไม่บังคับ — สำหรับของสด/เบเกอรี่)</label>
+    <input class="fi" type="date" id="iExp">
+    <div class="fhint">ระบบจะแจ้งเตือน 3 วันก่อนหมดอายุ</div>
   </div>
   <input type="hidden" id="iEditId">
   <div style="display:flex;gap:8px;margin-top:6px">
@@ -690,7 +729,14 @@ function saveLog(){ localStorage.setItem('bcLog', JSON.stringify(receiveLog)); }
 function nextId(){ return Math.max(0,...items.map(x=>x.id))+1; }
 
 // ===================== SHEETS SYNC =====================
-function saveScriptUrl(){
+function saveAcctUrl(){
+  const url=document.getElementById('acctUrlInput').value.trim();
+  if(url&&!url.startsWith('https://script.google.com')){ toast('URL ไม่ถูกต้อง','error'); return; }
+  localStorage.setItem('bcAcctScriptUrl', url);
+  const st=document.getElementById('acctUrlStatus');
+  if(st) st.textContent = url ? '✅ บันทึกแล้ว — จะส่งรายจ่ายอัตโนมัติเมื่อกรอกค่าใช้จ่ายตอนรับสินค้า' : 'ล้าง URL แล้ว';
+  toast('บันทึก URL บัญชีแล้ว','success');
+}
   const url = document.getElementById('scriptUrlInput').value.trim();
   if(!url.startsWith('https://script.google.com')){ toast('URL ไม่ถูกต้อง','error'); return; }
   localStorage.setItem(SCRIPT_URL_KEY, url);
@@ -778,15 +824,31 @@ function renderStats(){
   `;
 }
 
+function fmtDate(raw){
+  if(!raw) return '';
+  return String(raw).replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
+}
+function daysUntilExp(exp){
+  if(!exp) return 999;
+  const d=new Date(exp); d.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.round((d-today)/(1000*60*60*24));
+}
+
 function renderAlerts(){
   const critical = items.filter(x=>getStatus(x)==='out').slice(0,4);
   const low = items.filter(x=>getStatus(x)==='low').slice(0,3);
+  const expiring = items.filter(x=>x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0);
   let h = '';
   critical.forEach(x=>{
     h+=`<div class="alert-item"><div class="alert-dot"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดทั้งร้านและบ้าน ต้องสั่งด่วน!</span></div>`;
   });
   low.forEach(x=>{
     h+=`<div class="alert-item warn"><div class="alert-dot warn"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— ร้านเหลือ ${x.shop} ${x.u} (Min: ${x.min})</span></div>`;
+  });
+  expiring.forEach(x=>{
+    const d=daysUntilExp(x.exp);
+    h+=`<div class="alert-item" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3);animation:none"><div class="alert-dot" style="background:#ff9632;animation:none"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
   });
   document.getElementById('alertWrap').innerHTML = h;
 }
@@ -964,12 +1026,12 @@ function renderReceiveLog(){
     <div class="log-item">
       <div class="log-left">
         <div class="log-name">${l.name}</div>
-        <div class="log-meta">${CAT_LABEL[l.cat]||l.cat}${l.note?' · '+l.note:''}</div>
+        <div class="log-meta">${CAT_LABEL[l.cat]||l.cat}${l.note?' · '+l.note:''}${l.cost?` · ฿${(+l.cost).toLocaleString()}`:''}</div>
         <div class="log-loc"><span class="loc-badge ${l.loc==='home'?'loc-home':'loc-shop'}">${l.loc==='home'?'🏠 บ้าน':'📦 ร้าน'}</span></div>
       </div>
       <div style="text-align:right">
         <div class="log-qty">+${l.qty} ${l.unit}</div>
-        <div class="log-date">${l.date}</div>
+        <div class="log-date">${fmtDate(l.date)}</div>
       </div>
     </div>`).join('');
 }
@@ -1038,26 +1100,63 @@ function doAdjust(){
 
 function openReceiveModal(){ fillRecSelect(); openModal('receiveOverlay'); }
 
+function fmtDate(raw){
+  if(!raw) return '';
+  return String(raw).replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
+}
+
+function daysUntilExp(exp){
+  if(!exp) return 999;
+  const d=new Date(exp); d.setHours(0,0,0,0);
+  const today=new Date(); today.setHours(0,0,0,0);
+  return Math.round((d-today)/(1000*60*60*24));
+}
+
+async function pushExpenseToAccounting(item, qty, cost, costCat, note){
+  const acctUrl = localStorage.getItem('bcAcctScriptUrl')||'';
+  if(!acctUrl||!cost) return;
+  const d = new Date();
+  const dateStr = d.toISOString().split('T')[0]; // YYYY-MM-DD
+  const detail = `ซื้อ ${item.n} x${qty} ${item.u}${note?' ('+note+')':''}`;
+  try{
+    await fetch(acctUrl, {
+      method:'POST',
+      body: JSON.stringify({
+        action: 'addExpense',
+        date: dateStr,
+        category: costCat,
+        detail: detail,
+        amount: cost,
+      }),
+    });
+  }catch(e){ /* silent — ไม่กระทบการทำงานหลัก */ }
+}
+
 function doReceive(){
   const id=+document.getElementById('recItem').value;
   const qty=+document.getElementById('recQty').value;
   const loc=document.getElementById('recLoc').value;
   const note=document.getElementById('recNote').value.trim();
+  const cost=+document.getElementById('recCost').value||0;
+  const costCat=document.getElementById('recCostCat').value||'Mixed';
   if(!id||!qty){ toast('กรุณาเลือกสินค้าและระบุจำนวน','error'); return; }
   const item=items.find(x=>x.id===id);
   if(!item) return;
   item[loc]+=qty;
   const d=new Date();
-  receiveLog.push({id:Date.now(),name:item.n,cat:item.cat,qty,unit:item.u,loc,note,date:d.toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'})});
+  const dateStr=d.toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
+  receiveLog.push({id:Date.now(),name:item.n,cat:item.cat,qty,unit:item.u,loc,note,cost,costCat,date:dateStr});
   saveItems(); saveLog();
   document.getElementById('recItem').value='';
   document.getElementById('recQty').value='';
   document.getElementById('recNote').value='';
+  document.getElementById('recCost').value='';
   closeModal('receiveOverlay');
   renderAll(); renderReceiveLog();
   pushSaveAll();
   pushAddLog(receiveLog[receiveLog.length-1]);
-  toast(`รับ ${item.n} +${qty} ${item.u} เข้า${loc==='home'?'บ้าน':'ร้าน'}`,'success');
+  if(cost>0) pushExpenseToAccounting(item, qty, cost, costCat, note);
+  toast(`รับ ${item.n} +${qty} ${item.u}${cost>0?' · บันทึกรายจ่าย ฿'+cost.toLocaleString():''}`, 'success');
 }
 
 function openAddModal(){
@@ -1068,6 +1167,7 @@ function openAddModal(){
   document.getElementById('iShop').value='0';
   document.getElementById('iHome').value='0';
   document.getElementById('iMin').value='2';
+  document.getElementById('iExp').value='';
   document.getElementById('iEditId').value='';
   openModal('itemOverlay');
 }
@@ -1083,6 +1183,7 @@ function openEditModal(id){
   document.getElementById('iHome').value=x.home;
   document.getElementById('iMin').value=x.min;
   document.getElementById('iSrc').value=x.src||'';
+  document.getElementById('iExp').value=x.exp||'';
   document.getElementById('iEditId').value=id;
   openModal('itemOverlay');
 }
@@ -1095,14 +1196,15 @@ function saveItem(){
   const home=+document.getElementById('iHome').value||0;
   const min=+document.getElementById('iMin').value||0;
   const src=document.getElementById('iSrc').value||'';
+  const exp=document.getElementById('iExp').value||'';
   if(!name||!u){ toast('กรุณากรอกชื่อสินค้าและหน่วย','error'); return; }
   const eid=+document.getElementById('iEditId').value;
   if(eid){
     const item=items.find(x=>x.id===eid);
-    if(item) Object.assign(item,{n:name,cat,u,shop,home,min,src});
+    if(item) Object.assign(item,{n:name,cat,u,shop,home,min,src,exp});
     toast('แก้ไขรายการเรียบร้อย','success');
   } else {
-    items.push({id:nextId(),n:name,cat,u,shop,home,min,src});
+    items.push({id:nextId(),n:name,cat,u,shop,home,min,src,exp});
     toast('เพิ่มรายการใหม่เรียบร้อย','success');
   }
   saveItems(); closeModal('itemOverlay'); renderAll();
@@ -1130,6 +1232,11 @@ function showSection(s){
     const disp = document.getElementById('scriptUrlDisplay');
     if(disp && scriptUrl) disp.textContent = scriptUrl.substring(0,60)+'…';
     if(scriptUrl) document.getElementById('urlShareCard').style.display='block';
+    const acctInp=document.getElementById('acctUrlInput');
+    const acctUrl=localStorage.getItem('bcAcctScriptUrl')||'';
+    if(acctInp) acctInp.value=acctUrl;
+    const acctSt=document.getElementById('acctUrlStatus');
+    if(acctSt&&acctUrl) acctSt.textContent='✅ เชื่อมต่อกับระบบบัญชีแล้ว';
   }
 }
 
