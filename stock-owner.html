@@ -1134,11 +1134,11 @@ function daysUntilExp(exp){
 
 async function pushExpenseToAccounting(item, qty, cost, costCat, note){
   const acctUrl = localStorage.getItem('bcAcctScriptUrl')||'';
-  if(!acctUrl||!cost) return;
+  if(!acctUrl) throw new Error('ไม่มี URL บัญชี');
+  if(!cost) return;
   const d = new Date();
   const dateStr = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
   const desc = `ซื้อ ${item.n} x${qty} ${item.u}${note?' ('+note+')':''}`;
-  // Apps Script บัญชีรับผ่าน GET ?type=expense&date=&cat=&desc=&amount=
   const params = new URLSearchParams({
     type: 'expense',
     date: dateStr,
@@ -1146,15 +1146,13 @@ async function pushExpenseToAccounting(item, qty, cost, costCat, note){
     desc: desc,
     amount: String(cost),
   });
-  try{
-    const r = await fetch(acctUrl+'?'+params.toString());
-    const json = await r.json();
-    if(json.ok) console.log('[บัญชี] บันทึกรายจ่ายสำเร็จ');
-    else console.warn('[บัญชี] error:', json);
-  }catch(e){ console.warn('[บัญชี] fetch ล้มเหลว:', e); }
+  const r = await fetch(acctUrl+'?'+params.toString());
+  const json = await r.json();
+  if(!json.ok) throw new Error('Apps Script ตอบ error: '+JSON.stringify(json));
+  console.log('[บัญชี] บันทึกรายจ่ายสำเร็จ');
 }
 
-function doReceive(){
+async function doReceive(){
   const id=+document.getElementById('recItem').value;
   const qty=+document.getElementById('recQty').value;
   const loc=document.getElementById('recLoc').value;
@@ -1164,11 +1162,16 @@ function doReceive(){
   if(!id||!qty){ toast('กรุณาเลือกสินค้าและระบุจำนวน','error'); return; }
   const item=items.find(x=>x.id===id);
   if(!item) return;
+
+  // snapshot ข้อมูลก่อน clear form
+  const itemName=item.n, itemU=item.u;
   item[loc] = +(+item[loc] || 0) + qty;
   const d=new Date();
   const dateStr=d.toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
-  receiveLog.push({id:Date.now(),name:item.n,cat:item.cat,qty,unit:item.u,loc,note,cost,costCat,date:dateStr});
+  receiveLog.push({id:Date.now(),name:itemName,cat:item.cat,qty,unit:itemU,loc,note,cost,costCat,date:dateStr});
   saveItems(); saveLog();
+
+  // clear form และปิด modal
   document.getElementById('recItem').value='';
   document.getElementById('recQty').value='';
   document.getElementById('recNote').value='';
@@ -1177,14 +1180,19 @@ function doReceive(){
   renderAll(); renderReceiveLog();
   pushSaveAll();
   pushAddLog(receiveLog[receiveLog.length-1]);
+
+  // ส่งรายจ่ายไปบัญชี (await เพื่อให้แน่ใจว่าส่งจริง)
   if(cost>0){
-    pushExpenseToAccounting(item, qty, cost, costCat, note).then(()=>{
-      toast(`✅ บันทึกรายจ่าย ฿${cost.toLocaleString()} ไประบบบัญชีแล้ว`,'success');
-    }).catch(()=>{
-      toast(`⚠️ บันทึกสต็อกแล้ว แต่ส่งบัญชีไม่ได้ — ตรวจสอบ URL`,'error');
-    });
+    toast(`⏳ กำลังส่งรายจ่าย ฿${cost.toLocaleString()} ไประบบบัญชี...`,'info');
+    try{
+      await pushExpenseToAccounting(item, qty, cost, costCat, note);
+      toast(`✅ รับ ${itemName} +${qty} ${itemU} · บันทึกรายจ่าย ฿${cost.toLocaleString()} แล้ว`,'success');
+    }catch(e){
+      toast(`⚠️ รับสินค้าแล้ว แต่ส่งรายจ่ายไปบัญชีไม่ได้ — ตรวจสอบ URL`,'error');
+    }
+  } else {
+    toast(`รับ ${itemName} +${qty} ${itemU} เข้า${loc==='home'?'บ้าน':'ร้าน'}`,'success');
   }
-  toast(`รับ ${item.n} +${qty} ${item.u}${cost>0?' · บันทึกรายจ่าย ฿'+cost.toLocaleString():''}`, 'success');
 }
 
 function openAddModal(){
