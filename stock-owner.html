@@ -324,6 +324,7 @@ select.fi option{background:var(--bg3)}
       <button class="btn btn-primary" onclick="openReceiveModal()">+ รับสินค้าเข้า</button>
     </div>
   </div>
+  <div id="expireAlertReceive" class="alert-wrap" style="margin-bottom:16px"></div>
   <div class="log-list" id="receiveLog">
     <div class="empty"><div class="empty-icon">📭</div><div>ยังไม่มีประวัติรับสินค้า</div></div>
   </div>
@@ -472,6 +473,13 @@ select.fi option{background:var(--bg3)}
   <div class="fg">
     <label class="fl">หมายเหตุ (ไม่บังคับ)</label>
     <input class="fi" type="text" id="recNote" placeholder="เช่น ล็อตใหม่, วันหมดอายุ...">
+  </div>
+  <div class="fg">
+    <label class="fl">วันหมดอายุ (ไม่บังคับ — สำหรับของสด/เบเกอรี่)</label>
+    <input class="fi" type="date" id="recExp"
+      style="color-scheme:dark;-webkit-appearance:none;appearance:none"
+      min="2025-01-01" max="2030-12-31">
+    <div class="fhint">ระบบจะแจ้งเตือน 3 วันก่อนหมดอายุ · พิมพ์แบบ ปปปป-ดด-วว เช่น 2025-04-30</div>
   </div>
   <div class="fg" style="background:rgba(240,165,0,.06);border:1px solid rgba(240,165,0,.2);border-radius:var(--rs);padding:12px">
     <label class="fl" style="color:var(--accent)">💰 บันทึกค่าใช้จ่าย (ไปหน้าบัญชีอัตโนมัติ)</label>
@@ -802,9 +810,8 @@ async function pushAddLog(entry){
 
 // ===================== STATUS =====================
 function getStatus(item){
-  const tot = item.shop + item.home;
-  if (item.shop === 0 && item.home === 0) return 'out';
-  if (item.shop < item.min) return 'low';
+  if(+item.shop === 0) return 'out';
+  if(+item.shop < +item.min) return 'low';
   return 'ok';
 }
 function statusLabel(s){ return s==='out'?'หมด':s==='low'?'ต่ำ':'ปกติ'; }
@@ -1026,6 +1033,30 @@ function renderReport(){
   `;
 }
 
+function renderExpireAlerts(){
+  const el = document.getElementById('expireAlertReceive');
+  if(!el) return;
+  const expiring = items.filter(x=>x.exp && daysUntilExp(x.exp)<=3 && daysUntilExp(x.exp)>=0);
+  const expired  = items.filter(x=>x.exp && daysUntilExp(x.exp)<0);
+  let h='';
+  expiring.forEach(x=>{
+    const d=daysUntilExp(x.exp);
+    h+=`<div class="alert-item" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3);animation:none">
+      <div class="alert-dot" style="background:#ff9632;animation:none"></div>
+      <span class="alert-name">${x.n}</span>
+      <span class="alert-detail">— หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span>
+    </div>`;
+  });
+  expired.forEach(x=>{
+    h+=`<div class="alert-item">
+      <div class="alert-dot"></div>
+      <span class="alert-name">${x.n}</span>
+      <span class="alert-detail">— หมดอายุแล้ว (${x.exp}) ⛔</span>
+    </div>`;
+  });
+  el.innerHTML = h;
+}
+
 function renderReceiveLog(){
   const el = document.getElementById('receiveLog');
   if(!receiveLog.length){ el.innerHTML=`<div class="empty"><div class="empty-icon">📭</div><div>ยังไม่มีประวัติรับสินค้า</div></div>`; return; }
@@ -1157,6 +1188,7 @@ async function doReceive(){
   const qty=+document.getElementById('recQty').value;
   const loc=document.getElementById('recLoc').value;
   const note=document.getElementById('recNote').value.trim();
+  const exp=document.getElementById('recExp').value||'';
   const cost=+document.getElementById('recCost').value||0;
   const costCat=document.getElementById('recCostCat').value||'วัตถุดิบ (อื่นๆ)';
   if(!id||!qty){ toast('กรุณาเลือกสินค้าและระบุจำนวน','error'); return; }
@@ -1166,6 +1198,8 @@ async function doReceive(){
   // snapshot ข้อมูลก่อน clear form
   const itemName=item.n, itemU=item.u;
   item[loc] = +(+item[loc] || 0) + qty;
+  // อัปเดตวันหมดอายุถ้ากรอกมา
+  if(exp) item.exp = exp;
   const d=new Date();
   const dateStr=d.toLocaleString('th-TH',{day:'numeric',month:'short',year:'numeric',hour:'2-digit',minute:'2-digit'});
   receiveLog.push({id:Date.now(),name:itemName,cat:item.cat,qty,unit:itemU,loc,note,cost,costCat,date:dateStr});
@@ -1175,6 +1209,7 @@ async function doReceive(){
   document.getElementById('recItem').value='';
   document.getElementById('recQty').value='';
   document.getElementById('recNote').value='';
+  document.getElementById('recExp').value='';
   document.getElementById('recCost').value='';
   closeModal('receiveOverlay');
   renderAll(); renderReceiveLog();
@@ -1260,7 +1295,7 @@ function showSection(s){
   document.getElementById('sec-'+s).classList.add('active');
   document.querySelectorAll('.nav-item').forEach(x=>x.classList.remove('active'));
   event.currentTarget.classList.add('active');
-  if(s==='receive') renderReceiveLog();
+  if(s==='receive'){ renderReceiveLog(); renderExpireAlerts(); }
   if(s==='report') renderReport();
   if(s==='settings'){
     const inp = document.getElementById('scriptUrlInput');
