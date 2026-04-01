@@ -182,6 +182,7 @@ select.fi option{background:var(--bg3)}
   <div id="pg-receive" class="page">
     <div class="page-title">รับสินค้าเข้า</div>
     <div class="page-sub">บันทึกของที่รับ — sync ขึ้น Sheets ทันที</div>
+    <div id="expireAlertReceive" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px"></div>
     <div class="recv-form">
       <div class="fg">
         <label class="fl">เลือกสินค้า</label>
@@ -205,8 +206,15 @@ select.fi option{background:var(--bg3)}
         </select>
       </div>
       <div class="fg">
+        <label class="fl">วันหมดอายุ (ไม่บังคับ)</label>
+        <input class="fi" type="date" id="recExp"
+          style="color-scheme:dark;-webkit-appearance:none;appearance:none"
+          min="2025-01-01" max="2030-12-31">
+        <div style="font-size:11px;color:var(--text3);margin-top:3px">แจ้งเตือน 3 วันก่อนหมดอายุ · พิมพ์แบบ ปปปป-ดด-วว</div>
+      </div>
+      <div class="fg">
         <label class="fl">หมายเหตุ (ไม่บังคับ)</label>
-        <input class="fi" type="text" id="recNote" placeholder="เช่น ล็อตใหม่, วันหมดอายุ...">
+        <input class="fi" type="text" id="recNote" placeholder="เช่น ล็อตใหม่...">
       </div>
       <button class="btn btn-primary" id="recBtn" onclick="doReceive()">✓ บันทึกรับสินค้า</button>
     </div>
@@ -354,7 +362,7 @@ async function pushLog(entry){
 
 /* ---- HELPERS ---- */
 function st(x){
-  if(+x.shop===0&&+x.home===0) return 'out';
+  if(+x.shop===0) return 'out';
   if(+x.shop<+x.min) return 'low';
   return 'ok';
 }
@@ -499,13 +507,13 @@ async function doReceive(){
   const id=document.getElementById('recItem').value;
   const qty=+document.getElementById('recQty').value;
   const loc=document.getElementById('recLoc').value;
+  const exp=document.getElementById('recExp').value||'';
   const note=document.getElementById('recNote').value.trim();
   if(!id||!qty){toast('กรุณาเลือกสินค้าและระบุจำนวน','error');return;}
   const item=items.find(x=>+x.id===+id); if(!item) return;
 
-  // บวกยอดใน local ก่อน
-  const prevVal=+item[loc];
-  item[loc]=prevVal+qty;
+  item[loc]=+(+item[loc]||0)+qty;
+  if(exp) item.exp=exp;
   localStorage.setItem(STOCK_KEY,JSON.stringify(items));
 
   const entry={id:Date.now(),name:item.n,cat:item.cat,qty,unit:item.u,loc,note,
@@ -513,29 +521,41 @@ async function doReceive(){
   log.push(entry);
   localStorage.setItem(LOG_KEY,JSON.stringify(log));
 
-  // reset form ทันที
   document.getElementById('recItem').value='';
   document.getElementById('recQty').value='';
+  document.getElementById('recExp').value='';
   document.getElementById('recNote').value='';
   document.getElementById('recUnit').value='';
 
   const btn=document.getElementById('recBtn');
   btn.disabled=true; btn.textContent='⏳ กำลัง sync…';
-
   try{
-    // push ขึ้น Sheets ก่อน — ถ้า push สำเร็จ Sheets มีค่าใหม่แล้ว sync ครั้งต่อไปจะถูกต้อง
-    await Promise.all([
-      pushItem(item),
-      pushLog(entry),
-    ]);
+    await Promise.all([pushItem(item),pushLog(entry)]);
     toast(`รับ ${item.n} +${qty} ${item.u} เข้า${loc==='home'?'บ้าน':'ร้าน'} ✓`,'success');
   }catch(e){
-    // push ล้มเหลว — ค่า local ยังถูกอยู่ แจ้งให้ sync ด้วยตัวเอง
     toast(`บันทึก local แล้ว — กด Sync เพื่ออัปเดต Sheets`,'info');
   }
-
   btn.disabled=false; btn.textContent='✓ บันทึกรับสินค้า';
-  renderStock(); renderTodayLog();
+  renderStock(); renderTodayLog(); renderExpireAlerts();
+}
+
+function renderExpireAlerts(){
+  const el=document.getElementById('expireAlertReceive');
+  if(!el) return;
+  const expiring=items.filter(x=>x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0);
+  const expired =items.filter(x=>x.exp&&daysUntilExp(x.exp)<0);
+  let h='';
+  expiring.forEach(x=>{
+    const d=daysUntilExp(x.exp);
+    h+=`<div class="alert-strip" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3)">
+      <div class="adot" style="background:#ff9632;animation:none"></div>
+      <span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
+  });
+  expired.forEach(x=>{
+    h+=`<div class="alert-strip"><div class="adot"></div>
+      <span><strong>${x.n}</strong> — หมดอายุแล้ว (${x.exp}) ⛔</span></div>`;
+  });
+  el.innerHTML=h;
 }
 
 function renderTodayLog(){
@@ -610,7 +630,7 @@ function showPage(p,btn){
   document.querySelectorAll('.bnav-item').forEach(x=>x.classList.remove('active'));
   document.getElementById('pg-'+p).classList.add('active');
   btn.classList.add('active');
-  if(p==='receive'){fillRecSelect();renderTodayLog();}
+  if(p==='receive'){fillRecSelect();renderTodayLog();renderExpireAlerts();}
   if(p==='sourcing') renderSourcing();
   if(p==='log') renderFullLog();
   if(p==='stock') renderStock();
