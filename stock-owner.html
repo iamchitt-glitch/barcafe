@@ -796,13 +796,6 @@ function setSyncBtn(state){
   btn.style.color = state==='ok'?'var(--green)':state==='err'?'var(--red)':state==='syncing'?'var(--yellow)':'var(--text2)';
 }
 
-async function pushSaveAll(){
-  if(!scriptUrl) return;
-  try {
-    await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'saveStock', items})});
-  } catch(e) { /* silent */ }
-}
-
 async function pushAddLog(entry){
   if(!scriptUrl) return;
   try { await fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'addLog', entry})}); } catch(e) {}
@@ -1145,8 +1138,21 @@ function doAdjust(){
   item.shop = +document.getElementById('adjShop').value||0;
   item.home = +document.getElementById('adjHome').value||0;
   saveItems(); closeModal('adjOverlay'); renderAll();
-  if(scriptUrl) fetch(scriptUrl,{method:'POST',body:JSON.stringify({action:'updateItem',id:item.id,shop:item.shop,home:item.home})}).catch(()=>{});
+  pushItem(item).catch(()=>{});
   toast('บันทึกสต็อกเรียบร้อย','success');
+}
+
+async function pushItem(item){
+  if(!scriptUrl) return;
+  await fetch(scriptUrl, {method:'POST', body: JSON.stringify({
+    action: 'updateItem',
+    id:   item.id,
+    shop: item.shop,
+    home: item.home,
+    exp:  item.exp || '',
+    min:  item.min,
+    src:  item.src || '',
+  })});
 }
 
 function openReceiveModal(){ fillRecSelect(); openModal('receiveOverlay'); }
@@ -1213,7 +1219,8 @@ async function doReceive(){
   document.getElementById('recCost').value='';
   closeModal('receiveOverlay');
   renderAll(); renderReceiveLog();
-  pushSaveAll();
+  // ส่งเฉพาะ item ที่เปลี่ยน — ไม่ส่งทั้งหมด
+  pushItem(item).catch(()=>{});
   pushAddLog(receiveLog[receiveLog.length-1]);
 
   // ส่งรายจ่ายไปบัญชี (await เพื่อให้แน่ใจว่าส่งจริง)
@@ -1279,7 +1286,17 @@ function saveItem(){
     toast('เพิ่มรายการใหม่เรียบร้อย','success');
   }
   saveItems(); closeModal('itemOverlay'); renderAll();
-  pushSaveAll();
+  if(eid){
+    // แก้ไข — ส่งเฉพาะ item นั้น
+    const updatedItem = items.find(x=>x.id===eid);
+    if(updatedItem) pushItem(updatedItem).catch(()=>{});
+  } else {
+    // เพิ่มใหม่ — ส่ง addItem
+    const newItem = items[items.length-1];
+    if(newItem && scriptUrl){
+      fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'addItem', item: newItem})}).catch(()=>{});
+    }
+  }
 }
 
 function deleteItem(id){
