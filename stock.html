@@ -623,8 +623,7 @@ function renderFullLog(){
 
 function fmtDate(raw){
   if(!raw) return '';
-  // ตัด timezone suffix เช่น GMT+0700 (เวลาอินโดจีน) ออก
-  return String(raw).replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
+  return String(raw).replace(/\s*\d{2}:\d{2}:\d{2}.*/,'').replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
 }
 
 function logCard(l){
