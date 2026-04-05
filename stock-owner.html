@@ -302,7 +302,10 @@ select.fi option{background:var(--bg3)}
     <button class="filter-btn" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
     <button class="filter-btn" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
     <button class="filter-btn" onclick="setFilter('low',this)" style="color:var(--yellow);border-color:rgba(255,209,102,.3)">⚠ ต่ำ/หมด</button>
+    <button class="filter-btn" id="expFilterBtn" onclick="setFilter('exp',this)" style="color:#ff9632;border-color:rgba(255,150,50,.4)">⏰ ใกล้/หมดอายุ</button>
   </div>
+
+  <div id="expireAlertStock" class="alert-wrap" style="margin-bottom:14px"></div>
 
   <div class="card">
     <div class="table-wrap">
@@ -845,7 +848,8 @@ function daysUntilExp(exp){
 function renderAlerts(){
   const critical = items.filter(x=>getStatus(x)==='out').slice(0,4);
   const low = items.filter(x=>getStatus(x)==='low').slice(0,3);
-  const expiring = items.filter(x=>x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0);
+  const expiring = items.filter(x=>x.exp&&daysUntilExp(x.exp)<=2&&daysUntilExp(x.exp)>=0);
+  const expired  = items.filter(x=>x.exp&&daysUntilExp(x.exp)<0);
   let h = '';
   critical.forEach(x=>{
     h+=`<div class="alert-item"><div class="alert-dot"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดทั้งร้านและบ้าน ต้องสั่งด่วน!</span></div>`;
@@ -857,7 +861,23 @@ function renderAlerts(){
     const d=daysUntilExp(x.exp);
     h+=`<div class="alert-item" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3);animation:none"><div class="alert-dot" style="background:#ff9632;animation:none"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
   });
+  expired.forEach(x=>{
+    h+=`<div class="alert-item"><div class="alert-dot"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดอายุแล้ว (${x.exp}) ⛔</span></div>`;
+  });
   document.getElementById('alertWrap').innerHTML = h;
+  // แสดงซ้ำในหน้าสต็อกด้วย เพื่อให้ค้างอยู่เสมอ
+  const stockAlert = document.getElementById('expireAlertStock');
+  if(stockAlert){
+    let hs='';
+    expiring.forEach(x=>{
+      const d=daysUntilExp(x.exp);
+      hs+=`<div class="alert-item" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3);animation:none"><div class="alert-dot" style="background:#ff9632;animation:none"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
+    });
+    expired.forEach(x=>{
+      hs+=`<div class="alert-item"><div class="alert-dot"></div><span class="alert-name">${x.n}</span><span class="alert-detail">— หมดอายุแล้ว (${x.exp}) ⛔</span></div>`;
+    });
+    stockAlert.innerHTML = hs;
+  }
 }
 
 function renderLowTable(){
@@ -882,14 +902,19 @@ function renderTable(){
   const q = (document.getElementById('searchInput')||{value:''}).value.toLowerCase();
   let list = items.filter(x=>x.n.toLowerCase().includes(q));
   if(curFilter==='low') list = list.filter(x=>getStatus(x)!=='ok');
+  else if(curFilter==='exp') list = list.filter(x=>x.exp && daysUntilExp(x.exp)<=2);
   else if(curFilter!=='all') list = list.filter(x=>x.cat===curFilter);
   list.sort((a,b)=>{ const so={'out':0,'low':1,'ok':2}; return so[getStatus(a)]-so[getStatus(b)]; });
   let h='';
   list.forEach(x=>{
     const s=getStatus(x); const p=progPct(x);
     const srcKey=x.src||''; const srcLabel=SRC_LABEL[srcKey]||'ยังไม่ระบุ'; const srcCls=SRC_CLS[srcKey]||'src-etc'; const srcIcon=SRC_ICON[srcKey]||'⚪';
+    const expD=x.exp?daysUntilExp(x.exp):999;
+    const expBadge=x.exp&&expD<=2
+      ? `<span style="font-size:11px;background:${expD<0?'var(--red-bg)':'rgba(255,150,50,.12)'};color:${expD<0?'var(--red)':'#ff9632'};padding:2px 7px;border-radius:99px;margin-left:4px">⏰${expD<0?'หมดอายุแล้ว':expD===0?'หมดวันนี้':'อีก '+expD+' วัน'}</span>`
+      : '';
     h+=`<tr>
-      <td><div class="item-name">${x.n}</div></td>
+      <td><div class="item-name">${x.n}${expBadge}</div></td>
       <td><span class="badge ${CAT_CLS[x.cat]||'cat-snack'}">${CAT_LABEL[x.cat]||x.cat}</span></td>
       <td>
         <span class="stock-num ${statusCls(s)}">${x.shop}</span>
