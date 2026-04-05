@@ -838,7 +838,7 @@ function renderStats(){
 
 function fmtDate(raw){
   if(!raw) return '';
-  return String(raw).replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
+  return String(raw).replace(/\s*\d{2}:\d{2}:\d{2}.*/, '').replace(/\s*GMT[+\-]\d+.*$/i, '').replace(/\s*\(.*\)\s*$/, '').trim();
 }
 function daysUntilExp(exp){
   if(!exp) return 999;
@@ -1186,7 +1186,7 @@ function openReceiveModal(){ fillRecSelect(); openModal('receiveOverlay'); }
 
 function fmtDate(raw){
   if(!raw) return '';
-  return String(raw).replace(/\s*GMT[+\-]\d+.*$/i,'').replace(/\s*\(.*\)\s*$/,'').trim();
+  return String(raw).replace(/\s*\d{2}:\d{2}:\d{2}.*/, '').replace(/\s*GMT[+\-]\d+.*$/i, '').replace(/\s*\(.*\)\s*$/, '').trim();
 }
 
 function daysUntilExp(exp){
