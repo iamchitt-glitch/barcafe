@@ -174,6 +174,7 @@ select.fi option{background:var(--bg3)}
       <button class="filter-chip" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
       <button class="filter-chip" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
       <button class="filter-chip" onclick="setFilter('ing',this)">วัตถุดิบ</button>
+      <button class="filter-chip" onclick="setFilter('exp',this)" style="color:#ff9632;border-color:rgba(255,150,50,.4)">⏰ ใกล้/หมดอายุ</button>
     </div>
     <div class="stock-list" id="stockList"></div>
   </div>
@@ -393,6 +394,7 @@ function renderStock(){
   const q=(document.getElementById('searchInput')?.value||'').toLowerCase();
   let list=items.filter(x=>x.n.toLowerCase().includes(q));
   if(curFilter==='low') list=list.filter(x=>st(x)!=='ok');
+  else if(curFilter==='exp') list=list.filter(x=>x.exp&&daysUntilExp(x.exp)<=2);
   else if(curFilter!=='all') list=list.filter(x=>x.cat===curFilter);
   list.sort((a,b)=>{const m={out:0,low:1,ok:2};return m[st(a)]-m[st(b)];});
 
@@ -410,7 +412,7 @@ function renderStock(){
     alerts+=`<div class="alert-strip warn"><div class="adot warn"></div><span><strong>${x.n}</strong> — เหลือ ${x.shop} ${x.u}</span></div>`;
   });
   // แจ้งเตือนวันหมดอายุ ≤ 3 วัน
-  items.filter(x=>x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0).forEach(x=>{
+  items.filter(x=>x.exp&&daysUntilExp(x.exp)<=2&&daysUntilExp(x.exp)>=0).forEach(x=>{
     const d=daysUntilExp(x.exp);
     alerts+=`<div class="alert-strip" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3)"><div class="adot" style="background:#ff9632;animation:none"></div><span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
   });
@@ -429,7 +431,7 @@ function renderStock(){
           <span class="sc-badge ${CAT_CLS[x.cat]||''}">${CAT_LABEL[x.cat]||x.cat}</span>
           <span class="sc-badge ${SRC_CLS[sk]}">${SRC_ICON[sk]} ${SRC_LABEL[sk]}</span>
           ${+x.home>0?`<span style="color:#7ee8c8;font-size:13px;font-weight:600;background:rgba(45,212,160,.12);padding:2px 8px;border-radius:99px">🏠 ${x.home} ${x.u}</span>`:''}
-          ${x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0?`<span style="color:var(--red);font-size:11px;font-weight:600;background:var(--red-bg);padding:2px 7px;border-radius:99px">⏰ หมด${daysUntilExp(x.exp)===0?'วันนี้':daysUntilExp(x.exp)+' วัน'}</span>`:''}
+          ${x.exp&&daysUntilExp(x.exp)<=2&&daysUntilExp(x.exp)>=0?`<span style="color:var(--red);font-size:11px;font-weight:600;background:var(--red-bg);padding:2px 7px;border-radius:99px">⏰ หมด${daysUntilExp(x.exp)===0?'วันนี้':daysUntilExp(x.exp)+' วัน'}</span>`:''}
         </div>
         <div class="prog-bar"><div class="prog-fill pf-${s}" style="width:${p}%"></div></div>
       </div>
@@ -542,7 +544,7 @@ async function doReceive(){
 function renderExpireAlerts(){
   const el=document.getElementById('expireAlertReceive');
   if(!el) return;
-  const expiring=items.filter(x=>x.exp&&daysUntilExp(x.exp)<=3&&daysUntilExp(x.exp)>=0);
+  const expiring=items.filter(x=>x.exp&&daysUntilExp(x.exp)<=2&&daysUntilExp(x.exp)>=0);
   const expired =items.filter(x=>x.exp&&daysUntilExp(x.exp)<0);
   let h='';
   expiring.forEach(x=>{
