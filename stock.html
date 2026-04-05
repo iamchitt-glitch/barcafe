@@ -440,8 +440,12 @@ function renderStock(){
   list.sort((a,b)=>{const m={out:0,low:1,ok:2};return m[st(a)]-m[st(b)];});
 
   const total=items.length, out=items.filter(x=>st(x)==='out').length, low=items.filter(x=>st(x)==='low').length;
+  const expiring=items.filter(x=>x.exp&&daysUntilExp(x.exp)<=2&&daysUntilExp(x.exp)>=0).length;
+  const expired=items.filter(x=>x.exp&&daysUntilExp(x.exp)<0).length;
+  const expTotal=expiring+expired;
   document.getElementById('statsRow').innerHTML=`
     <div class="stat-card"><div class="stat-val" style="color:var(--text)">${total}</div><div class="stat-lbl">ทั้งหมด</div></div>
+    <div class="stat-card ${expTotal>0?'danger':''}"><div class="stat-val" style="color:${expTotal>0?'#ff9632':'var(--green)'}">${expTotal}</div><div class="stat-lbl">ใกล้/หมดอายุ</div></div>
     <div class="stat-card warn"><div class="stat-val" style="color:var(--yellow)">${low}</div><div class="stat-lbl">ใกล้หมด</div></div>
     <div class="stat-card danger"><div class="stat-val" style="color:var(--red)">${out}</div><div class="stat-lbl">หมดแล้ว</div></div>`;
 
@@ -455,7 +459,7 @@ function renderStock(){
   // แจ้งเตือนวันหมดอายุ ≤ 3 วัน
   items.filter(x=>x.exp&&daysUntilExp(x.exp)<=2&&daysUntilExp(x.exp)>=0).forEach(x=>{
     const d=daysUntilExp(x.exp);
-    alerts+=`<div class="alert-strip" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3)"><div class="adot" style="background:#ff9632;animation:none"></div><span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
+    alerts+=`<div class="alert-strip" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3)"><div class="adot" style="background:#ff9632;animation:none"></div><span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${fmtDate(x.exp)})</span></div>`;
   });
   document.getElementById('alertStrips').innerHTML=alerts;
 
@@ -507,8 +511,10 @@ function adj(id,delta){
   }
   // อัปเดต stats bar เงียบๆ
   const out=items.filter(x=>st(x)==='out').length, low=items.filter(x=>st(x)==='low').length;
+  const expTot=items.filter(x=>x.exp&&daysUntilExp(x.exp)<=2).length;
   document.getElementById('statsRow').innerHTML=`
     <div class="stat-card"><div class="stat-val" style="color:var(--text)">${items.length}</div><div class="stat-lbl">ทั้งหมด</div></div>
+    <div class="stat-card ${expTot>0?'danger':''}"><div class="stat-val" style="color:${expTot>0?'#ff9632':'var(--green)'}">${expTot}</div><div class="stat-lbl">ใกล้/หมดอายุ</div></div>
     <div class="stat-card warn"><div class="stat-val" style="color:var(--yellow)">${low}</div><div class="stat-lbl">ใกล้หมด</div></div>
     <div class="stat-card danger"><div class="stat-val" style="color:var(--red)">${out}</div><div class="stat-lbl">หมดแล้ว</div></div>`;
 
@@ -592,11 +598,11 @@ function renderExpireAlerts(){
     const d=daysUntilExp(x.exp);
     h+=`<div class="alert-strip" style="background:rgba(255,150,50,.07);border-color:rgba(255,150,50,.3)">
       <div class="adot" style="background:#ff9632;animation:none"></div>
-      <span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${x.exp})</span></div>`;
+      <span><strong>${x.n}</strong> — หมดอายุ${d===0?'วันนี้!':'ใน '+d+' วัน'} (${fmtDate(x.exp)})</span></div>`;
   });
   expired.forEach(x=>{
     h+=`<div class="alert-strip"><div class="adot"></div>
-      <span><strong>${x.n}</strong> — หมดอายุแล้ว (${x.exp}) ⛔</span></div>`;
+      <span><strong>${x.n}</strong> — หมดอายุแล้ว (${fmtDate(x.exp)}) ⛔</span></div>`;
   });
   el.innerHTML=h;
 }
