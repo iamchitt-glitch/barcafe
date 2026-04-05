@@ -140,7 +140,23 @@ select.fi option{background:var(--bg3)}
   <button class="tb-sync" id="syncBtn" onclick="syncAll()">
     <span id="syncIcon">☁️</span><span id="syncText">Sync</span>
   </button>
-  <div class="tb-role">พนักงาน</div>
+  <button class="tb-sync" onclick="openUrlSettings()" title="เปลี่ยน Script URL">⚙️</button>
+</div>
+
+<!-- URL SETTINGS MODAL -->
+<div id="urlSettingsOverlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:200;align-items:center;justify-content:center">
+  <div style="background:var(--bg2);border:1px solid var(--border2);border-radius:16px;padding:24px;width:92vw;max-width:420px">
+    <div style="font-size:16px;font-weight:700;margin-bottom:6px;color:var(--text)">⚙️ ตั้งค่า Script URL</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:14px">วาง URL ใหม่ที่ได้จาก Apps Script Deploy</div>
+    <input class="fi" type="url" id="changeUrlInput"
+      placeholder="https://script.google.com/macros/s/..."
+      style="width:100%;margin-bottom:12px;font-size:13px;padding:10px 12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--rs);color:var(--text);font-family:var(--font)">
+    <div id="currentUrlDisplay" style="font-size:11px;color:var(--text3);margin-bottom:14px;word-break:break-all"></div>
+    <div style="display:flex;gap:8px">
+      <button onclick="saveNewUrl()" style="flex:1;padding:11px;background:var(--accent);color:#0f1117;border:none;border-radius:var(--rs);font-size:14px;font-weight:600;font-family:var(--font);cursor:pointer">✓ บันทึก</button>
+      <button onclick="closeUrlSettings()" style="padding:11px 16px;background:var(--surface);color:var(--text2);border:1px solid var(--border);border-radius:var(--rs);font-size:14px;font-family:var(--font);cursor:pointer">ยกเลิก</button>
+    </div>
+  </div>
 </div>
 
 <!-- SETUP (แสดงถ้ายังไม่มี URL) -->
@@ -268,6 +284,31 @@ const SRC_META={
 };
 
 let items=[], log=[], curFilter='all', curSrcFilter='low', scriptUrl='', isSyncing=false;
+
+/* ---- URL SETTINGS ---- */
+function openUrlSettings(){
+  const overlay = document.getElementById('urlSettingsOverlay');
+  overlay.style.display = 'flex';
+  const inp = document.getElementById('changeUrlInput');
+  inp.value = scriptUrl || '';
+  const disp = document.getElementById('currentUrlDisplay');
+  disp.textContent = scriptUrl ? 'URL ปัจจุบัน: ' + scriptUrl.substring(0,55) + '…' : 'ยังไม่มี URL';
+}
+function closeUrlSettings(){
+  document.getElementById('urlSettingsOverlay').style.display = 'none';
+}
+function saveNewUrl(){
+  const url = document.getElementById('changeUrlInput').value.trim();
+  if(!url.startsWith('https://script.google.com')){
+    toast('URL ไม่ถูกต้อง — ต้องขึ้นต้นด้วย https://script.google.com','error');
+    return;
+  }
+  localStorage.setItem(URL_KEY, url);
+  scriptUrl = url;
+  closeUrlSettings();
+  toast('บันทึก URL ใหม่แล้ว — กำลัง Sync…','success');
+  syncAll();
+}
 
 /* ---- INIT ---- */
 function dedupeById(arr){
