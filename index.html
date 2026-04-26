@@ -143,6 +143,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
       <div class="ml">Wage<br><span style="font-size:10px;color:var(--t2)">(ไม่ควรเกิน 25%)</span></div>
       <div class="mv" id="dWage">฿0</div><div class="ms" id="dWageP">0%</div>
     </div>
+    <div class="mc" id="dGooCard">
+      <div class="ml">สินค้า (ลูกกอล์ฟ/ถุงมือ)</div>
+      <div class="mv" id="dGoo">฿0</div><div class="ms" id="dGooP">0% ของรายได้</div>
+    </div>
+  </div>
+  <div class="g2">
     <div class="mc" id="incCard" style="display:none">
       <div class="ml">Incentive Staff (฿5/แก้ว)</div>
       <div style="display:flex;gap:16px;margin-top:6px">
@@ -205,13 +211,22 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
             <option value="บรรจุภัณฑ์">บรรจุภัณฑ์</option>
             <option value="วัตถุดิบ (อื่นๆ)">วัตถุดิบ (อื่นๆ)</option>
           </optgroup>
+          <optgroup label="── สินค้า ──">
+            <option value="ลูกกอล์ฟ">ลูกกอล์ฟ</option>
+            <option value="ถุงมือ">ถุงมือ</option>
+            <option value="อื่น">อื่น</option>
+          </optgroup>
           <optgroup label="── ค่าใช้จ่าย ──">
             <option value="Rent">Rent</option>
             <option value="Utility">Utility</option>
             <option value="Maintenance">Maintenance</option>
-            <option value="Wage">Wage</option>
             <option value="MKT">MKT</option>
             <option value="Etc">Etc</option>
+          </optgroup>
+          <optgroup label="── Wage ──">
+            <option value="Staff 1">Staff 1</option>
+            <option value="Staff 2">Staff 2</option>
+            <option value="Welfare">Welfare</option>
           </optgroup>
         </select>
       </div>
@@ -279,11 +294,12 @@ body{font-family:'Sarabun',sans-serif;background:var(--bg);color:var(--t);min-he
 
 <script>
 const MAT_CATS  = ['ชา/กาแฟ','ไซรัป','ขนม','เบเกอรี่','เครื่องดื่ม','บรรจุภัณฑ์','วัตถุดิบ (อื่นๆ)'];
+const GOO_CATS  = ['ลูกกอล์ฟ','ถุงมือ','อื่น'];
 const OPE_CATS  = ['Rent','Utility','Maintenance','MKT','Etc'];
-const WAGE_CATS = ['Wage'];
-const ALL_CATS  = [...MAT_CATS,...OPE_CATS,...WAGE_CATS];
-const CAT_MAP   = {'วัตถุดิบ':'วัตถุดิบ (อื่นๆ)','ค่าแรง':'Wage','ค่าเช่า':'Rent','ค่าไฟน้ำ':'Utility','ซ่อมบำรุง':'Maintenance','อื่นๆ':'Etc','Mixed':'วัตถุดิบ (อื่นๆ)','Appetizer':'ชา/กาแฟ','Beverages':'เครื่องดื่ม','Fruits':'วัตถุดิบ (อื่นๆ)','Bakery':'เบเกอรี่','Snack':'ขนม'};
-const CAT_CLS   = {'ชา/กาแฟ':'bg','ไซรัป':'bg','ขนม':'bg','เบเกอรี่':'bg','เครื่องดื่ม':'bg','บรรจุภัณฑ์':'bg','วัตถุดิบ (อื่นๆ)':'bg',Rent:'bb',Utility:'bb',Maintenance:'bb',MKT:'ba',Etc:'bb',Wage:'br'};
+const WAGE_CATS = ['Wage','Staff 1','Staff 2','Welfare'];
+const ALL_CATS  = [...MAT_CATS,...GOO_CATS,...OPE_CATS,...WAGE_CATS];
+const CAT_MAP   = {'วัตถุดิบ':'วัตถุดิบ (อื่นๆ)','ค่าแรง':'Staff 1','ค่าเช่า':'Rent','ค่าไฟน้ำ':'Utility','ซ่อมบำรุง':'Maintenance','อื่นๆ':'Etc','Mixed':'วัตถุดิบ (อื่นๆ)','Appetizer':'ชา/กาแฟ','Beverages':'เครื่องดื่ม','Fruits':'วัตถุดิบ (อื่นๆ)','Bakery':'เบเกอรี่','Snack':'ขนม','Wage':'Staff 1'};
+const CAT_CLS   = {'ชา/กาแฟ':'bg','ไซรัป':'bg','ขนม':'bg','เบเกอรี่':'bg','เครื่องดื่ม':'bg','บรรจุภัณฑ์':'bg','วัตถุดิบ (อื่นๆ)':'bg','ลูกกอล์ฟ':'bc','ถุงมือ':'bc','อื่น':'bc',Rent:'bb',Utility:'bb',Maintenance:'bb',MKT:'ba',Etc:'bb',Wage:'br','Staff 1':'br','Staff 2':'br',Welfare:'br'};
 const DAY = ['อา','จ','อ','พ','พฤ','ศ','ส'];
 const MON = ['ม.ค.','ก.พ.','มี.ค.','เม.ย.','พ.ค.','มิ.ย.','ก.ค.','ส.ค.','ก.ย.','ต.ค.','พ.ย.','ธ.ค.'];
 
@@ -585,6 +601,7 @@ function renderDash(){
   const tp=Math.min(tI>0?Math.round(tI/tgt*100):0,100);
   const MAT_ALL=[...MAT_CATS,'Mixed','Appetizer','Beverages','Fruits','Bakery','Snack'];
   const tMat =exp.filter(e=>MAT_ALL.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
+  const tGoo =exp.filter(e=>GOO_CATS.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
   const tOpe =exp.filter(e=>OPE_CATS.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
   const tWage=exp.filter(e=>WAGE_CATS.includes(e.cat)).reduce((s,e)=>s+e.amount,0);
   const s1=inc.reduce((s,i)=>s+(parseInt(i.staff1)||0),0);
@@ -615,6 +632,11 @@ function renderDash(){
   const wageEl=document.getElementById('dWage');
   wageEl.textContent=fmt(tWage);wageEl.className='mv '+(pWage>25?'cr':pWage>20?'ca':'cg');
   document.getElementById('dWageP').textContent=pWage+'% ของรายได้';
+  const pGoo=pct(tGoo,tI);
+  const gooEl=document.getElementById('dGoo');
+  gooEl.textContent=fmt(tGoo);
+  gooEl.className='mv bc';
+  document.getElementById('dGooP').textContent=pGoo+'% ของรายได้';
   const has=s1>0||s2>0;
   document.getElementById('incCard').style.display=has?'block':'none';
   document.getElementById('noIncCard').style.display=has?'none':'block';
