@@ -776,7 +776,12 @@ async function syncAll(){
       fetch(scriptUrl + '?type=log',   {cache:'no-cache'}),
     ]);
     const d1 = await r1.json(), d2 = await r2.json();
-    if(d1.ok && d1.data.length > 0){ items = d1.data; saveItems(); }
+    if(d1.ok && d1.data.length > 0){
+      // กรอง deleted ids ออก ป้องกันรายการที่ลบแล้วกลับมาจาก Sheets
+      const deleted = JSON.parse(localStorage.getItem('bcDeletedIds')||'[]');
+      items = d1.data.filter(x=>!deleted.includes(x.id)&&!deleted.includes(+x.id));
+      saveItems();
+    }
     if(d2.ok){ receiveLog = d2.data; saveLog(); }
     setSyncBtn('ok');
     renderAll(); renderReceiveLog();
@@ -1268,10 +1273,12 @@ function openAddModal(){
   editId=null;
   document.getElementById('itemModalTitle').innerHTML='+ เพิ่มรายการใหม่ <button class="mclose" onclick="closeModal(\'itemOverlay\')">✕</button>';
   document.getElementById('iName').value='';
+  document.getElementById('iCat').value='drink';
   document.getElementById('iUnit').value='';
   document.getElementById('iShop').value='0';
   document.getElementById('iHome').value='0';
   document.getElementById('iMin').value='2';
+  document.getElementById('iSrc').value='';
   document.getElementById('iExp').value='';
   document.getElementById('iEditId').value='';
   openModal('itemOverlay');
@@ -1318,19 +1325,37 @@ function saveItem(){
     const updatedItem = items.find(x=>x.id===eid);
     if(updatedItem) pushItem(updatedItem).catch(()=>{});
   } else {
-    // เพิ่มใหม่ — ส่ง addItem
+    // เพิ่มใหม่ — ส่ง addItem และล้าง deleted list ของ id นี้
     const newItem = items[items.length-1];
     if(newItem && scriptUrl){
-      fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'addItem', item: newItem})}).catch(()=>{});
+      const deleted = JSON.parse(localStorage.getItem('bcDeletedIds')||'[]');
+      const cleaned = deleted.filter(d=>d!==newItem.id&&d!==+newItem.id);
+      localStorage.setItem('bcDeletedIds', JSON.stringify(cleaned));
+      fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'addItem', item: newItem})})
+        .then(r=>r.json())
+        .then(j=>{ if(!j.ok) toast('เพิ่มรายการบน Sheets ไม่สำเร็จ — ลองกด Sync','info'); })
+        .catch(()=>toast('บันทึก local แล้ว — กด Sync เพื่ออัปเดต Sheets','info'));
     }
   }
 }
 
 function deleteItem(id){
   if(!confirm('ลบรายการนี้?')) return;
-  items=items.filter(x=>x.id!==id);
+  items = items.filter(x=>x.id!==id);
+  // เก็บ id ที่ลบไว้ ป้องกัน sync ดึงกลับมา
+  const deleted = JSON.parse(localStorage.getItem('bcDeletedIds')||'[]');
+  if(!deleted.includes(id)) deleted.push(id);
+  localStorage.setItem('bcDeletedIds', JSON.stringify(deleted));
   saveItems(); renderAll();
-  toast('ลบรายการเรียบร้อย','success');
+  // push ขึ้น Sheets
+  if(scriptUrl){
+    fetch(scriptUrl, {method:'POST', body: JSON.stringify({action:'deleteItem', id})})
+      .then(r=>r.json())
+      .then(j=>{ if(j.ok) toast('ลบรายการเรียบร้อย ✓','success'); else toast('ลบ local แล้ว — Sheets อาจยังไม่อัปเดต','info'); })
+      .catch(()=>toast('ลบ local แล้ว — ไม่มีการเชื่อมต่อ','info'));
+  } else {
+    toast('ลบรายการเรียบร้อย','success');
+  }
 }
 
 // ===================== NAV =====================
