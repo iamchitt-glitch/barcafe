@@ -294,9 +294,8 @@ select.fi option{background:var(--bg3)}
   <div class="filter-row">
     <input class="search-box" type="text" placeholder="🔍  ค้นหาชื่อสินค้า..." id="searchInput" oninput="renderTable()">
     <button class="filter-btn active" onclick="setFilter('all',this)">ทั้งหมด</button>
-    <button class="filter-btn" onclick="setFilter('ing',this)">วัตถุดิบ</button>
-    <button class="filter-btn" onclick="setFilter('drink',this)">ชา/กาแฟ</button>
-    <button class="filter-btn" onclick="setFilter('syrup',this)">ไซรัป</button>
+    <button class="filter-btn" onclick="setFilter('ing',this)">ของสด</button>
+    <button class="filter-btn" onclick="setFilter('drink',this)">น้ำชง</button>
     <button class="filter-btn" onclick="setFilter('snack',this)">ขนม</button>
     <button class="filter-btn" onclick="setFilter('cake',this)">เบเกอรี่</button>
     <button class="filter-btn" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
@@ -494,13 +493,12 @@ select.fi option{background:var(--bg3)}
       <div class="fg" style="margin-bottom:0">
         <label class="fl">หมวดบัญชี</label>
         <select class="fi" id="recCostCat">
-          <option value="ชา/กาแฟ">ชา/กาแฟ</option>
-          <option value="ไซรัป">ไซรัป</option>
+          <option value="น้ำชง">น้ำชง</option>
           <option value="ขนม">ขนม</option>
           <option value="เบเกอรี่">เบเกอรี่</option>
           <option value="เครื่องดื่ม">เครื่องดื่ม</option>
           <option value="บรรจุภัณฑ์">บรรจุภัณฑ์</option>
-          <option value="วัตถุดิบ (อื่นๆ)">วัตถุดิบ (อื่นๆ)</option>
+          <option value="ของสด">ของสด</option>
         </select>
       </div>
     </div>
@@ -525,13 +523,12 @@ select.fi option{background:var(--bg3)}
     <div class="fg">
       <label class="fl">หมวดหมู่</label>
       <select class="fi" id="iCat">
-        <option value="drink">ชา/กาแฟ/โกโก้</option>
-        <option value="syrup">ไซรัป/น้ำปรุง</option>
+        <option value="drink">น้ำชง (ชา/กาแฟ/ไซรัป)</option>
         <option value="snack">ขนมทานเล่น</option>
-        <option value="cake">เค้ก/เบเกอรี่</option>
+        <option value="cake">เบเกอรี่</option>
         <option value="bev">เครื่องดื่มพิเศษ</option>
         <option value="pack">ภาชนะ/บรรจุภัณฑ์</option>
-        <option value="ing">วัตถุดิบ</option>
+        <option value="ing">ของสด</option>
       </select>
     </div>
     <div class="fg">
@@ -610,8 +607,8 @@ select.fi option{background:var(--bg3)}
 
 <script>
 // ===================== DATA =====================
-const CAT_LABEL = {drink:'ชา/กาแฟ',syrup:'ไซรัป',snack:'ขนม',cake:'เค้ก',bev:'เครื่องดื่ม',pack:'บรรจุภัณฑ์',ing:'วัตถุดิบ'};
-const CAT_CLS   = {drink:'cat-drink',syrup:'cat-syrup',snack:'cat-snack',cake:'cat-cake',bev:'cat-bev',pack:'cat-pack',ing:'cat-ing'};
+const CAT_LABEL = {drink:'น้ำชง',syrup:'น้ำชง',snack:'ขนม',cake:'เบเกอรี่',bev:'เครื่องดื่ม',pack:'บรรจุภัณฑ์',ing:'ของสด'};
+const CAT_CLS   = {drink:'cat-drink',syrup:'cat-drink',snack:'cat-snack',cake:'cat-cake',bev:'cat-bev',pack:'cat-pack',ing:'cat-ing'};
 const SRC_LABEL = {makro:'Makro',market:'ตลาด',shop:'ร้านค้า',online:'Online',etc:'อื่นๆ',''  :'ยังไม่ระบุ'};
 const SRC_CLS   = {makro:'src-makro',market:'src-market',shop:'src-shop',online:'src-online',etc:'src-etc',''  :'src-etc'};
 const SRC_ICON  = {makro:'🟢',market:'🟠',shop:'🟣',online:'🔵',etc:'⚫',''  :'⚪'};
@@ -732,9 +729,12 @@ const INIT = [
 // ===================== STATE =====================
 const SCRIPT_URL_KEY = 'bcStockScriptUrl';
 let scriptUrl = localStorage.getItem(SCRIPT_URL_KEY) || '';
+// ให้ตรงกับระบบบัญชี: ไซรัป รวมเข้า น้ำชง (รหัส drink)
+const normCat = x => (x && x.cat==='syrup') ? {...x, cat:'drink'} : x;
 let items = JSON.parse(localStorage.getItem('bcStock') || 'null');
 if (!items) { items = INIT.map((x,i)=>({...x,id:i+1})); saveItems(); }
-let receiveLog = JSON.parse(localStorage.getItem('bcLog') || '[]');
+items = items.map(normCat);
+let receiveLog = JSON.parse(localStorage.getItem('bcLog') || '[]').map(normCat);
 let curFilter = 'all';
 let curSrcFilter = 'all';
 let editId = null;
@@ -779,10 +779,10 @@ async function syncAll(){
     if(d1.ok && d1.data.length > 0){
       // กรอง deleted ids ออก ป้องกันรายการที่ลบแล้วกลับมาจาก Sheets
       const deleted = JSON.parse(localStorage.getItem('bcDeletedIds')||'[]');
-      items = d1.data.filter(x=>!deleted.includes(x.id)&&!deleted.includes(+x.id));
+      items = d1.data.filter(x=>!deleted.includes(x.id)&&!deleted.includes(+x.id)).map(normCat);
       saveItems();
     }
-    if(d2.ok){ receiveLog = d2.data; saveLog(); }
+    if(d2.ok){ receiveLog = d2.data.map(normCat); saveLog(); }
     setSyncBtn('ok');
     renderAll(); renderReceiveLog();
     if(document.getElementById('syncStatus')) document.getElementById('syncStatus').textContent = '✅ Sync เรียบร้อย — ' + new Date().toLocaleTimeString('th-TH');
@@ -1104,7 +1104,7 @@ function fillRecSelect(){
   if(!sel) return;
   const cur = sel.value;
   sel.innerHTML = `<option value="">— เลือกหมวดและรายการ —</option>`;
-  const catOrder=['ing','drink','syrup','snack','cake','bev','pack'];
+  const catOrder=['ing','drink','snack','cake','bev','pack'];
   catOrder.forEach(cat=>{
     const group = items.filter(x=>x.cat===cat);
     if(!group.length) return;
@@ -1228,7 +1228,7 @@ async function doReceive(){
   const note=document.getElementById('recNote').value.trim();
   const exp=document.getElementById('recExp').value||'';
   const cost=+document.getElementById('recCost').value||0;
-  const costCat=document.getElementById('recCostCat').value||'วัตถุดิบ (อื่นๆ)';
+  const costCat=document.getElementById('recCostCat').value||'ของสด';
   if(!id||!qty){ toast('กรุณาเลือกสินค้าและระบุจำนวน','error'); return; }
   const item=items.find(x=>x.id===id);
   if(!item) return;
