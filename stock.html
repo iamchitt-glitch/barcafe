@@ -183,13 +183,12 @@ select.fi option{background:var(--bg3)}
     <div class="filter-scroll">
       <button class="filter-chip active" onclick="setFilter('all',this)">ทั้งหมด</button>
       <button class="filter-chip danger" onclick="setFilter('low',this)">⚠ ต้องซื้อ</button>
-      <button class="filter-chip" onclick="setFilter('drink',this)">ชา/กาแฟ</button>
-      <button class="filter-chip" onclick="setFilter('syrup',this)">ไซรัป</button>
+      <button class="filter-chip" onclick="setFilter('drink',this)">น้ำชง</button>
       <button class="filter-chip" onclick="setFilter('snack',this)">ขนม</button>
       <button class="filter-chip" onclick="setFilter('cake',this)">เบเกอรี่</button>
       <button class="filter-chip" onclick="setFilter('bev',this)">เครื่องดื่ม</button>
       <button class="filter-chip" onclick="setFilter('pack',this)">บรรจุภัณฑ์</button>
-      <button class="filter-chip" onclick="setFilter('ing',this)">วัตถุดิบ</button>
+      <button class="filter-chip" onclick="setFilter('ing',this)">ของสด</button>
       <button class="filter-chip" onclick="setFilter('exp',this)" style="color:#ff9632;border-color:rgba(255,150,50,.4)">⏰ ใกล้/หมดอายุ</button>
     </div>
     <div class="stock-list" id="stockList"></div>
@@ -269,8 +268,10 @@ select.fi option{background:var(--bg3)}
 
 <script>
 const URL_KEY='bcStockScriptUrl', STOCK_KEY='bcStock', LOG_KEY='bcLog';
-const CAT_LABEL={drink:'ชา/กาแฟ',syrup:'ไซรัป',snack:'ขนม',cake:'เค้ก',bev:'เครื่องดื่ม',pack:'บรรจุภัณฑ์',ing:'วัตถุดิบ'};
-const CAT_CLS={drink:'cat-drink',syrup:'cat-syrup',snack:'cat-snack',cake:'cat-cake',bev:'cat-bev',pack:'cat-pack',ing:'cat-ing'};
+const CAT_LABEL={drink:'น้ำชง',snack:'ขนม',cake:'เบเกอรี่',bev:'เครื่องดื่ม',pack:'บรรจุภัณฑ์',ing:'ของสด'};
+// ให้ตรงกับระบบบัญชี: ไซรัป รวมเข้า น้ำชง (รหัส drink) — ข้อมูลเดิมใน Sheets ไม่ต้องแก้
+const normCat=x=>(x&&x.cat==='syrup')?Object.assign({},x,{cat:'drink'}):x;
+const CAT_CLS={drink:'cat-drink',syrup:'cat-drink',snack:'cat-snack',cake:'cat-cake',bev:'cat-bev',pack:'cat-pack',ing:'cat-ing'};
 const SRC_LABEL={makro:'Makro',market:'ตลาด',shop:'ร้านค้า',online:'Online',etc:'อื่นๆ','':'ยังไม่ระบุ'};
 const SRC_CLS={makro:'src-makro',market:'src-market',shop:'src-shop',online:'src-online',etc:'src-etc','':'src-etc'};
 const SRC_ICON={makro:'🟠',market:'🟢',shop:'🟣',online:'🔵',etc:'⚫','':'⚪'};
@@ -321,8 +322,8 @@ function init(){
   const rawItems=JSON.parse(localStorage.getItem(STOCK_KEY)||'[]');
   const rawLog=JSON.parse(localStorage.getItem(LOG_KEY)||'[]');
   // dedupe ทุกครั้งที่โหลด — กำจัดรายการซ้ำที่สะสมมา
-  items=dedupeById(rawItems);
-  log=dedupeById(rawLog);
+  items=dedupeById(rawItems).map(normCat);
+  log=dedupeById(rawLog).map(normCat);
   if(items.length!==rawItems.length) localStorage.setItem(STOCK_KEY,JSON.stringify(items));
   if(log.length!==rawLog.length) localStorage.setItem(LOG_KEY,JSON.stringify(log));
 
@@ -371,14 +372,14 @@ async function syncAll(){
       // merge: ถ้า id ซ้ำให้ใช้ค่าจาก Sheets (source of truth)
       // แต่ถ้า local มี id ที่ Sheets ไม่มี ให้คงไว้ (เพิ่งเพิ่มใหม่)
       const sheetMap=new Map(d1.data.map(x=>[String(x.id),x]));
-      items=d1.data; // ใช้ Sheets เป็น source of truth
+      items=d1.data.map(normCat); // ใช้ Sheets เป็น source of truth
       localStorage.setItem(STOCK_KEY,JSON.stringify(items));
     }
     if(d2.ok){
       // dedupe log ด้วย id
       const seen=new Set(log.map(l=>String(l.id)));
       const newEntries=(d2.data||[]).filter(l=>!seen.has(String(l.id)));
-      log=[...log,...newEntries];
+      log=[...log,...newEntries.map(normCat)];
       localStorage.setItem(LOG_KEY,JSON.stringify(log));
     }
     setSyncUI('ok');
@@ -528,7 +529,7 @@ function fillRecSelect(){
   const cur=sel.value;
   sel.innerHTML='<option value="">— เลือกหมวดและรายการ —</option>';
   // จัดกลุ่มตามหมวดหมู่
-  const catOrder=['drink','syrup','snack','cake','bev','pack','ing'];
+  const catOrder=['drink','snack','cake','bev','pack','ing'];
   catOrder.forEach(cat=>{
     const group=items.filter(x=>x.cat===cat);
     if(!group.length) return;
